@@ -274,7 +274,7 @@ A suitable tool choice is Vite plus a single-file inlining plugin, Vitest, and j
 
 ## Step 2 — Define The Word-Set Domain And Runtime Validation
 
-**Status:** [ ]
+**Status:** [x]
 
 ### Goal
 
@@ -323,13 +323,13 @@ Introduce precise TypeScript contracts and validation for imported word-set JSON
 
 ### Definition Of Done
 
-- [ ] All closed string sets use enums.
-- [ ] All object shapes use explicit interfaces.
-- [ ] Validation accepts the canonical format.
-- [ ] Validation rejects malformed or incomplete data.
-- [ ] Error output is suitable for display to the user.
-- [ ] No unsafe TypeScript escape hatch was introduced.
-- [ ] Tests pass and the step record is updated.
+- [x] All closed string sets use enums.
+- [x] All object shapes use explicit interfaces.
+- [x] Validation accepts the canonical format.
+- [x] Validation rejects malformed or incomplete data.
+- [x] Error output is suitable for display to the user.
+- [x] No unsafe TypeScript escape hatch was introduced.
+- [x] Tests pass and the step record is updated.
 
 ---
 
@@ -1063,3 +1063,32 @@ Verified:
 Plan changes:
 - Reassessed Steps 2, 3, and 4; they remain executable against the new strict TypeScript, Vitest/jsdom, and framework-free source skeleton.
 - No architecture or scope contract changed.
+
+### 2026-07-12 — Step 2
+
+Implemented:
+- Added UI-state enums for theme, page phase, and translation group.
+- Added word-set domain enums and interfaces for Greek cases, grammatical number, declension entries, words, word sets, persisted records, and validation results.
+- Added `parseWordSetJson` and `validateWordSetInput` for canonical JSON validation from `unknown`.
+- Added deterministic id normalization for missing word-set and word ids.
+- Added validation for non-empty user-visible strings, unique normalized word ids, singular/plural declension presence, supported cases, duplicate cases, and canonical case order.
+- Added a six-word reference fixture based on `example/Греческие слова.dc.html`.
+- Added invalid import coverage for malformed JSON, missing name, missing word fields, unsupported case, duplicate case, missing declension number, wrong primitive type, and duplicate ids after normalization.
+
+Verified:
+- `npm run typecheck`
+- passed
+- `npm run lint`
+- passed
+- `npm run test`
+- 2 test files passed, 11 tests passed
+- `npm run check`
+- passed
+- `rg -n "\\bas\\b|\\bany\\b" src tests --glob '*.ts' || true`
+- no matches
+
+Plan changes:
+- Reassessed Step 3: it should consume the normalized `IWordSet` contract with required stable word ids for reducer state keys.
+- Reassessed Step 4: persistence can store only UI state ids and does not need to serialize word-set contents.
+- Reassessed Step 5: IndexedDB records should use the exported `IPersistedWordSetRecord` shape and store validated `IWordSet.words`.
+- No changes to `AGENTS.md`; the required next-three-step reassessment rule is already present there.
