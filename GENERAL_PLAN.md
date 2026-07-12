@@ -682,7 +682,7 @@ Render loaded word-set data and implement independent and global translation rev
 
 ## Step 9 — Implement Inline Declension Expansion
 
-**Status:** [ ]
+**Status:** [x]
 
 ### Goal
 
@@ -731,13 +731,13 @@ Implement the interactive word cell and inline singular/plural declension sectio
 
 ### Definition Of Done
 
-- [ ] The entire word cell toggles expansion.
-- [ ] Chevron direction and tooltip are correct.
-- [ ] Details appear inline below the matching row.
-- [ ] Multiple rows can remain open.
-- [ ] All eight case records render in canonical order.
-- [ ] Detail translations are always visible.
-- [ ] Accessibility attributes and tests are present.
+- [x] The entire word cell toggles expansion.
+- [x] Chevron direction and tooltip are correct.
+- [x] Details appear inline below the matching row.
+- [x] Multiple rows can remain open.
+- [x] All eight case records render in canonical order.
+- [x] Detail translations are always visible.
+- [x] Accessibility attributes and tests are present.
 
 ---
 
@@ -1276,3 +1276,37 @@ Plan changes:
 - Reassessed Step 9: the first-cell word button and chevron are already present; the next step should wire `toggle-declension`, `aria-expanded`, and inline detail rows.
 - Reassessed Step 10: upload buttons still intentionally no-op; the existing event delegation should route `load-word-set` to a hidden native file input and import effect.
 - Reassessed Step 11: keyboard activation for translation masks uses native buttons, but focus preservation after rerender and non-clipped tooltips remain Step 11 concerns.
+
+### 2026-07-12 — Step 9
+
+Implemented:
+- Wired `toggle-declension` through the existing delegated event handler to dispatch `DECLENSION_TOGGLED`.
+- Updated the first table cell button with `aria-expanded`, `aria-controls`, current-action tooltip text, and expanded chevron state.
+- Rendered inline detail rows immediately after expanded word rows.
+- Added a declension region with singular and plural groups titled `Единственное число` and `Множественное число`.
+- Rendered all case entries with Russian abbreviations `именит.`, `родит.`, `винит.`, `зват.`, Greek forms, glosses, Greek examples, and Russian example translations.
+- Kept declension translations fully visible regardless of the global translation mask state.
+- Added responsive declension layout: one column below the wider breakpoint and two columns from the tablet/desktop breakpoint.
+- Added reduced-motion coverage for the chevron transition.
+- Added DOM tests for aria state, tooltip updates, chevron click delegation, multiple expanded rows, canonical case order, and always-visible detail translations.
+
+Verified:
+- `npm run typecheck`
+- passed
+- `npm run lint`
+- passed
+- `npm run test`
+- 8 test files passed, 41 tests passed
+- `npm run build`
+- passed and emitted `dist/index.html`
+- `npm run check`
+- passed
+- `find dist -maxdepth 1 -type f -print`
+- returned only `dist/index.html`
+- `rg -n "support\\.js|_ds_bundle|<x-dc|<sc-if|<sc-for|DCLogic" src dist/index.html --glob '!example/**' || true`
+- no matches
+
+Plan changes:
+- Reassessed Step 10: file import can reuse the existing delegated action path but should add a real hidden native file input and an import effect/service instead of expanding renderer responsibility.
+- Reassessed Step 11: tooltips and focus preservation remain relevant because full rerender can replace focused controls after import and reveal actions.
+- Reassessed Step 12: visual comparison must include expanded declension rows in both themes and at the target responsive widths.

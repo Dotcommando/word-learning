@@ -4,7 +4,13 @@ import {
   PAGE_PHASE,
   THEME_MODE,
 } from '../features/ui-state/ui-state';
-import type { IWord, IWordSet } from '../features/word-sets/word-sets';
+import {
+  GRAMMATICAL_NUMBER,
+  GREEK_CASE,
+  type IDeclensionEntry,
+  type IWord,
+  type IWordSet,
+} from '../features/word-sets/word-sets';
 import {
   createBookIcon,
   createChevronIcon,
@@ -26,6 +32,8 @@ const COLUMN_LABELS = [
   'Пример',
   'Перевод примера',
 ];
+const SINGULAR_DECLENSION_LABEL = 'Единственное число';
+const PLURAL_DECLENSION_LABEL = 'Множественное число';
 
 export function createAppTemplate(state: IUiState): HTMLElement {
   const app = createElement('section', 'app');
@@ -207,7 +215,13 @@ function createWordTable(wordSet: IWordSet, state: IUiState): HTMLElement {
   });
   thead.append(createHeaderRow());
   wordSet.words.forEach((word) => {
-    tbody.append(createWordRow(word, state));
+    const isExpanded = state.expandedWordIds.has(word.id);
+
+    tbody.append(createWordRow(word, state, isExpanded));
+
+    if (isExpanded) {
+      tbody.append(createDeclensionRow(word));
+    }
   });
   section.append(table);
 
@@ -229,12 +243,12 @@ function createHeaderRow(): HTMLTableRowElement {
   return row;
 }
 
-function createWordRow(word: IWord, state: IUiState): HTMLTableRowElement {
+function createWordRow(word: IWord, state: IUiState, isExpanded: boolean): HTMLTableRowElement {
   const row = document.createElement('tr');
 
   row.className = '_word-table-row';
   row.append(
-    createWordCell(word),
+    createWordCell(word, isExpanded),
     createTextCell(word.transcription, '_word-table-cell _word-table-cell__transcription'),
     createTranslationCell({
       action: 'toggle-word-translation',
@@ -258,22 +272,108 @@ function createWordRow(word: IWord, state: IUiState): HTMLTableRowElement {
   return row;
 }
 
-function createWordCell(word: IWord): HTMLTableCellElement {
+function createWordCell(word: IWord, isExpanded: boolean): HTMLTableCellElement {
   const cell = document.createElement('td');
   const button = document.createElement('button');
   const label = createElement('span', '_word-table-word', word.word);
+  const detailId = createDeclensionRegionId(word.id);
+  const tooltip = isExpanded ? 'Скрыть склонение' : 'Показать склонение';
 
   cell.className = '_word-table-cell _word-table-cell__word';
-  button.className = '_word-table-word-button tooltip';
+  button.className = isExpanded
+    ? '_word-table-word-button _word-table-word-button__expanded tooltip'
+    : '_word-table-word-button tooltip';
   button.type = 'button';
   button.dataset['action'] = 'toggle-declension';
   button.dataset['wordId'] = word.id;
-  button.dataset['tooltip'] = 'Показать склонение';
-  button.setAttribute('aria-label', `Показать склонение слова ${word.word}`);
+  button.dataset['tooltip'] = tooltip;
+  button.setAttribute('aria-expanded', String(isExpanded));
+  button.setAttribute('aria-controls', detailId);
+  button.setAttribute('aria-label', `${tooltip} слова ${word.word}`);
   button.append(label, createChevronIcon());
   cell.append(button);
 
   return cell;
+}
+
+function createDeclensionRow(word: IWord): HTMLTableRowElement {
+  const row = document.createElement('tr');
+  const cell = document.createElement('td');
+  const region = createDeclensionRegion(word);
+
+  row.className = '_word-table-detail-row';
+  cell.className = '_word-table-cell _word-table-cell__detail';
+  cell.colSpan = COLUMN_LABELS.length;
+  cell.append(region);
+  row.append(cell);
+
+  return row;
+}
+
+function createDeclensionRegion(word: IWord): HTMLElement {
+  const region = createElement('section', 'declension');
+
+  region.id = createDeclensionRegionId(word.id);
+  region.setAttribute('aria-label', `Склонение слова ${word.word}`);
+  region.append(
+    createDeclensionGroup(SINGULAR_DECLENSION_LABEL, word.declensions.singular, GRAMMATICAL_NUMBER.SINGULAR),
+    createDeclensionGroup(PLURAL_DECLENSION_LABEL, word.declensions.plural, GRAMMATICAL_NUMBER.PLURAL),
+  );
+
+  return region;
+}
+
+function createDeclensionGroup(
+  title: string,
+  entries: IDeclensionEntry[],
+  grammaticalNumber: GRAMMATICAL_NUMBER,
+): HTMLElement {
+  const group = createElement('section', '_declension-group');
+  const heading = createElement('h3', '_declension-heading', title);
+  const list = createElement('dl', '_declension-list');
+
+  group.dataset['grammaticalNumber'] = grammaticalNumber;
+  group.append(heading, list);
+  entries.forEach((entry) => {
+    list.append(createDeclensionTerm(entry), createDeclensionDescription(entry));
+  });
+
+  return group;
+}
+
+function createDeclensionTerm(entry: IDeclensionEntry): HTMLElement {
+  const term = createElement('dt', '_declension-case', createCaseAbbreviation(entry.case));
+
+  return term;
+}
+
+function createDeclensionDescription(entry: IDeclensionEntry): HTMLElement {
+  const description = createElement('dd', '_declension-entry');
+  const form = createElement('span', '_declension-form', entry.form);
+  const translation = createElement('span', '_declension-translation', entry.translation);
+  const example = createElement('span', '_declension-example', entry.example);
+  const exampleTranslation = createElement('span', '_declension-example-translation', entry.exampleTranslation);
+
+  description.append(form, translation, example, exampleTranslation);
+
+  return description;
+}
+
+function createDeclensionRegionId(wordId: string): string {
+  return `declension-${wordId}`;
+}
+
+function createCaseAbbreviation(greekCase: GREEK_CASE): string {
+  switch (greekCase) {
+    case GREEK_CASE.NOMINATIVE:
+      return 'именит.';
+    case GREEK_CASE.GENITIVE:
+      return 'родит.';
+    case GREEK_CASE.ACCUSATIVE:
+      return 'винит.';
+    case GREEK_CASE.VOCATIVE:
+      return 'зват.';
+  }
 }
 
 function createTextCell(text: string, className: string): HTMLTableCellElement {

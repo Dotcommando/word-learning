@@ -138,6 +138,63 @@ describe('renderApp', () => {
     expect(root.querySelectorAll('._word-table-mask__hidden')).toHaveLength(4);
     expect(getButton(root, '[data-action="toggle-all-translations"]').getAttribute('aria-label')).toBe('Показать все переводы');
   });
+
+  it('expands declension details inline with aria state and updated tooltip', () => {
+    const root = createInteractiveRoot();
+    const wordButton = getButton(root, '[data-action="toggle-declension"][data-word-id="word-1"]');
+
+    wordButton.click();
+
+    const expandedButton = getButton(root, '[data-action="toggle-declension"][data-word-id="word-1"]');
+    const regionId = expandedButton.getAttribute('aria-controls');
+
+    if (regionId === null) {
+      throw new Error('Expanded word button is missing aria-controls.');
+    }
+
+    expect(expandedButton.getAttribute('aria-expanded')).toBe('true');
+    expect(expandedButton.getAttribute('data-tooltip')).toBe('Скрыть склонение');
+    expect(expandedButton.classList.contains('_word-table-word-button__expanded')).toBe(true);
+    expect(regionId).toBe('declension-word-1');
+    expect(getElement(root, `#${regionId}`).textContent).toContain('Единственное число');
+    expect(getElement(root, `#${regionId}`).textContent).toContain('Множественное число');
+  });
+
+  it('toggles declension when the chevron is clicked and keeps multiple rows open', () => {
+    const root = createInteractiveRoot();
+    const firstChevron = getElement(root, '[data-action="toggle-declension"][data-word-id="word-1"] svg');
+
+    firstChevron.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    getButton(root, '[data-action="toggle-declension"][data-word-id="word-2"]').click();
+
+    expect(root.querySelectorAll('.declension')).toHaveLength(2);
+    expect(getButton(root, '[data-action="toggle-declension"][data-word-id="word-1"]').getAttribute('aria-expanded')).toBe('true');
+    expect(getButton(root, '[data-action="toggle-declension"][data-word-id="word-2"]').getAttribute('aria-expanded')).toBe('true');
+  });
+
+  it('renders all declension cases in canonical order with visible translations', () => {
+    const root = createInteractiveRoot();
+
+    getButton(root, '[data-action="toggle-declension"][data-word-id="word-1"]').click();
+    getButton(root, '[data-action="toggle-all-translations"]').click();
+
+    const region = getElement(root, '#declension-word-1');
+
+    expect([...region.querySelectorAll('._declension-case')].map((caseLabel) => caseLabel.textContent)).toEqual([
+      'именит.',
+      'родит.',
+      'винит.',
+      'зват.',
+      'именит.',
+      'родит.',
+      'винит.',
+      'зват.',
+    ]);
+    expect(region.textContent).toContain('form nominative');
+    expect(region.textContent).toContain('translation nominative');
+    expect(region.textContent).toContain('example translation nominative');
+    expect(region.querySelector('._word-table-mask')).toBeNull();
+  });
 });
 
 function createInteractiveRoot(): HTMLElement {
@@ -167,6 +224,16 @@ function getButton(root: HTMLElement, selector: string): HTMLButtonElement {
   }
 
   return button;
+}
+
+function getElement(root: HTMLElement, selector: string): Element {
+  const element = root.querySelector(selector);
+
+  if (element === null) {
+    throw new Error(`Missing element for selector ${selector}`);
+  }
+
+  return element;
 }
 
 function createWordSet(): IWordSet {

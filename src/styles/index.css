@@ -377,6 +377,10 @@ button {
   transition: transform var(--transition-fast);
 }
 
+._word-table-word-button__expanded ._icon {
+  transform: rotate(180deg);
+}
+
 ._word-table-word {
   font-family: var(--font-heading);
   font-size: 19px;
@@ -419,6 +423,82 @@ button {
   color: var(--color-accent-strong);
 }
 
+._word-table-detail-row {
+  border-top: 1px solid var(--color-divider);
+}
+
+._word-table-cell__detail {
+  padding: 0;
+  background: color-mix(in srgb, var(--color-accent) 6%, transparent);
+}
+
+.declension {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+  padding: 20px 18px 22px;
+  border-left: 3px solid var(--color-accent);
+}
+
+._declension-group {
+  min-width: 0;
+}
+
+._declension-heading {
+  margin: 0 0 12px;
+  color: var(--color-accent-strong);
+  font-family: var(--font-heading);
+  font-size: 17px;
+  font-weight: var(--font-heading-weight);
+  line-height: 1.2;
+}
+
+._declension-list {
+  display: grid;
+  grid-template-columns: minmax(54px, max-content) minmax(0, 1fr);
+  gap: 10px 12px;
+  margin: 0;
+}
+
+._declension-case {
+  color: var(--color-muted);
+  font-size: 12px;
+  font-style: italic;
+  line-height: 1.35;
+}
+
+._declension-entry {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  margin: 0;
+}
+
+._declension-form {
+  color: var(--color-accent-strong);
+  font-family: var(--font-heading);
+  font-size: 18px;
+  font-weight: var(--font-heading-weight);
+  line-height: 1.15;
+}
+
+._declension-translation {
+  color: var(--color-text);
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+._declension-example {
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+._declension-example-translation {
+  color: var(--color-muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
 ._toolbar-button:focus-visible,
 ._statebox-button:focus-visible,
 ._word-table-word-button:focus-visible,
@@ -437,6 +517,12 @@ button {
 @media (min-width: 992px) {
   .app {
     --container-width: 920px;
+  }
+
+  .declension {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+    padding: 22px 22px 24px;
   }
 }
 
@@ -458,6 +544,7 @@ button {
   ._word-table-row,
   ._word-table-word-button ._icon,
   ._word-table-mask,
+  .declension,
   .tooltip::after,
   ._statebox-pulse {
     animation-duration: 1ms;

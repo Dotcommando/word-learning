@@ -124,6 +124,8 @@ function dispatchButtonAction(button: HTMLButtonElement, store: IStore<IUiState,
       dispatchWordAction(wordId, store, UI_ACTION_TYPE.EXAMPLE_TRANSLATION_TOGGLED);
       break;
     case 'toggle-declension':
+      dispatchDeclensionAction(wordId, store);
+      break;
     case 'load-word-set':
       break;
     case undefined:
@@ -144,6 +146,17 @@ function dispatchWordAction(
 
   store.dispatch({
     type,
+    wordId,
+  });
+}
+
+function dispatchDeclensionAction(wordId: string | undefined, store: IStore<IUiState, UiAction>): void {
+  if (wordId === undefined) {
+    return;
+  }
+
+  store.dispatch({
+    type: UI_ACTION_TYPE.DECLENSION_TOGGLED,
     wordId,
   });
 }
