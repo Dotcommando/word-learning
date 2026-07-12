@@ -910,7 +910,7 @@ Bring the implementation into close visual agreement with the Claude Design scre
 
 ## Step 13 — Finalize The Single-File Production Build
 
-**Status:** [ ]
+**Status:** [x]
 
 ### Goal
 
@@ -954,13 +954,13 @@ Also inspect the final document for forbidden runtime references.
 
 ### Definition Of Done
 
-- [ ] All checks pass.
-- [ ] `dist/index.html` is the only output file.
-- [ ] CSS, JavaScript, and SVG icons are inline.
-- [ ] CSS and JavaScript are minified.
-- [ ] The file works when opened directly.
-- [ ] The file works from a local static server.
-- [ ] No reference-runtime dependency remains.
+- [x] All checks pass.
+- [x] `dist/index.html` is the only output file.
+- [x] CSS, JavaScript, and SVG icons are inline.
+- [x] CSS and JavaScript are minified.
+- [x] The file works when opened directly.
+- [x] The file works from a local static server.
+- [x] No reference-runtime dependency remains.
 
 ---
 
@@ -1433,3 +1433,42 @@ Plan changes:
 - Reassessed Step 13: final production build verification should remain mostly contract-focused because screenshot tooling is unavailable unless added.
 - Reassessed Step 14: final handoff should explicitly mention that visual evidence used static reference metrics and thumbnail review rather than captured browser screenshots.
 - No scope change; `example/` remains reference-only and unmodified.
+
+### 2026-07-12 — Step 13
+
+Implemented:
+- Removed the bottom white page band by preventing page-level horizontal overflow on `html` and `body`.
+- Restored the intended bottom breathing room by setting `--space-page-bottom` to `80px`; horizontal scrolling remains scoped to the table scroller.
+- Made `--color-background` available on `:root` and added a dark-theme `:root[data-theme="dark"]` override so document-level space outside `.app` uses the current theme background.
+- Synced `document.documentElement.dataset.theme` from the Flux UI state during rendering.
+- Rebuilt the production distributable and verified `dist/index.html` remains the only output file.
+- Confirmed the final document contains one inline executable script and one inline style block.
+- Confirmed there are no external local CSS, JS, or SVG asset paths in the distributable.
+- Confirmed SVG icon construction is bundled into the inline JavaScript.
+- Confirmed no Claude Design custom elements, runtime identifiers, or `example/` references remain.
+- Recorded output size.
+
+Verified:
+- `npm run check`
+- passed; 9 test files passed, 50 tests passed
+- `npm run build`
+- passed and emitted `dist/index.html`
+- `find dist -type f -print`
+- returned only `dist/index.html`
+- `wc -c dist/index.html && gzip -c dist/index.html | wc -c`
+- `40583` bytes uncompressed, `11339` bytes gzipped
+- `node -e "..."`
+- verified one inline `<style>`, one inline `<script>`, no `<link>`, no external script, no external CSS, no forbidden Claude Design/runtime references, bundled SVG construction, and minified JavaScript
+- `node` style/script size check
+- CSS style block length `11442`, 2 lines, whitespace ratio `0.0192`; JavaScript block length `27299`, 1 line, whitespace ratio `0.0318`
+- `python3 -m http.server 4173 --directory dist`
+- local static server served `http://127.0.0.1:4173/index.html` with HTTP `200`
+- `rg -n -- "--space-page-bottom: 80px|--space-page-bottom:80px|overflow-x: hidden|overflow-x:hidden|overflow-x: auto|overflow-x:auto" src/styles/index.css dist/index.html`
+- confirmed `80px` bottom spacing, hidden page-level horizontal overflow, and table-scoped horizontal scrolling are present in source and production output
+- `rg -n -- "--color-background|:root\\[data-theme|documentElement\\.dataset|data-theme" src tests dist/index.html`
+- confirmed the theme background variable is available on `html`, the dark root override is bundled, and renderer tests cover document theme synchronization
+
+Plan changes:
+- Reassessed Step 14: final review should note that direct browser `file://` interaction was not programmatically exercised because no browser CLI is available, but the output is self-contained and static-server smoke passed.
+- Reassessed Step 14: final verification should include a last source/runtime grep, git status review, and `example/` unchanged check.
+- Reassessed future styling work: keep document-level theme background synchronization because browser/devtools or viewport gutters can expose space outside the application root.

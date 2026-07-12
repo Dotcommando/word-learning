@@ -4,19 +4,29 @@
   box-sizing: border-box;
 }
 
+:root {
+  --color-background: #f3f2f2;
+}
+
+:root[data-theme="dark"] {
+  --color-background: #251f18;
+}
+
 html {
   min-height: 100%;
-  background: #f3f2f2;
+  background: var(--color-background);
+  overflow-x: hidden;
 }
 
 body {
   min-height: 100%;
   margin: 0;
-  background: #f3f2f2;
+  background: var(--color-background);
   color: #201f1d;
   font-family: Lora, Georgia, "Times New Roman", serif;
   font-size: 15px;
   line-height: 1.55;
+  overflow-x: hidden;
 }
 
 button {
@@ -38,7 +48,7 @@ button {
   --font-heading-weight: 600;
   --font-body: Lora, Georgia, "Times New Roman", serif;
   --space-page-top: 44px;
-  --space-page-bottom: 88px;
+  --space-page-bottom: 80px;
   --radius-medium: 4px;
   --radius-large: 7px;
   --shadow-small: 0 1px 2px color-mix(in srgb, #2d2b2b 14%, transparent);

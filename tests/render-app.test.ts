@@ -25,6 +25,7 @@ describe('renderApp', () => {
 
     renderApp(root, INITIAL_UI_STATE);
 
+    expect(document.documentElement.dataset['theme']).toBe(THEME_MODE.LIGHT);
     expect(root.querySelector('h1')?.textContent).toBe('Λέξεις');
     expect(root.textContent).toContain('Тренажёр греческих слов — вспоминайте перевод, прежде чем открыть его');
     expect(root.textContent).toContain('Набор не загружен');
@@ -109,6 +110,7 @@ describe('renderApp', () => {
     });
 
     expect(root.querySelector('.app')?.classList.contains('app__dark')).toBe(true);
+    expect(document.documentElement.dataset['theme']).toBe(THEME_MODE.DARK);
     expect(root.querySelector('[data-action="toggle-theme"]')?.getAttribute('aria-label')).toBe('Включить светлую тему');
   });
 

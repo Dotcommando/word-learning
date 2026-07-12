@@ -4,6 +4,7 @@ import { createAppTemplate } from './templates';
 export function renderApp(root: HTMLElement, state: IUiState): void {
   const focusKey = getActiveFocusKey(root);
 
+  document.documentElement.dataset['theme'] = state.theme;
   root.replaceChildren(createAppTemplate(state));
   restoreFocus(root, focusKey);
 }
