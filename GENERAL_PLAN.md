@@ -335,7 +335,7 @@ Introduce precise TypeScript contracts and validation for imported word-set JSON
 
 ## Step 3 — Implement The Flux Store Kernel
 
-**Status:** [ ]
+**Status:** [x]
 
 ### Goal
 
@@ -390,12 +390,12 @@ Create a small typed Flux store with pure reducers, subscriptions, and determini
 
 ### Definition Of Done
 
-- [ ] The generic store works and has deterministic tests.
-- [ ] All UI transitions are represented as typed actions.
-- [ ] Reducers are pure and exhaustive.
-- [ ] Stable ids are used for row state.
-- [ ] Global and individual reveal semantics are documented by tests.
-- [ ] The step record includes test results.
+- [x] The generic store works and has deterministic tests.
+- [x] All UI transitions are represented as typed actions.
+- [x] Reducers are pure and exhaustive.
+- [x] Stable ids are used for row state.
+- [x] Global and individual reveal semantics are documented by tests.
+- [x] The step record includes test results.
 
 ---
 
@@ -622,7 +622,7 @@ Recreate the visual shell from the Claude Design reference with semantic HTML an
 
 ## Step 8 — Render The Vocabulary Table And Translation Masks
 
-**Status:** [ ]
+**Status:** [x]
 
 ### Goal
 
@@ -670,13 +670,13 @@ Render loaded word-set data and implement independent and global translation rev
 
 ### Definition Of Done
 
-- [ ] The table is fully data-driven.
-- [ ] Every translation cell toggles independently.
-- [ ] The global toggle has correct next-action semantics.
-- [ ] Hidden translations use the soft blurred-mask design.
-- [ ] Text wrapping and column ratios match the reference.
-- [ ] Imported strings cannot create markup.
-- [ ] Unit or DOM tests cover the critical behavior.
+- [x] The table is fully data-driven.
+- [x] Every translation cell toggles independently.
+- [x] The global toggle has correct next-action semantics.
+- [x] Hidden translations use the soft blurred-mask design.
+- [x] Text wrapping and column ratios match the reference.
+- [x] Imported strings cannot create markup.
+- [x] Unit or DOM tests cover the critical behavior.
 
 ---
 
@@ -1093,6 +1093,32 @@ Plan changes:
 - Reassessed Step 5: IndexedDB records should use the exported `IPersistedWordSetRecord` shape and store validated `IWordSet.words`.
 - No changes to `AGENTS.md`; the required next-three-step reassessment rule is already present there.
 
+### 2026-07-12 — Step 3
+
+Implemented:
+- Added the generic store contract and implementation with `getState`, `dispatch`, `subscribe`, and controlled state replacement for persistence hydration.
+- Added the UI state model for theme, phase, active word-set id, loaded word set, global translation visibility, per-word reveal sets, expanded word ids, and error message.
+- Added typed UI actions for bootstrap, theme toggling, global translations, individual translations, declension toggling, import, and invalid active-set clearing.
+- Implemented the pure exhaustive UI reducer.
+- Defined global translation semantics: mixed or hidden state shows all current translations; all-visible state hides all and clears reveal collections.
+- Kept row state keyed by stable word ids and reconciled stale ids when a loaded set changes.
+- Added reducer/store coverage for bootstrap states, theme toggling, individual reveal behavior, global reveal behavior, multiple expanded rows, and import state transitions.
+
+Verified:
+- `npm run typecheck`
+- passed
+- `npm run lint`
+- passed
+- `npm run test`
+- reducer and store tests pass in the current 8-file, 38-test suite
+- `npm run check`
+- passed
+
+Plan changes:
+- Reassessed Step 4: persistence should decorate the generic store without adding storage calls to reducers.
+- Reassessed Step 5: IndexedDB should remain outside reducer/store code and return data for effects to dispatch.
+- Reassessed Step 6: bootstrap should orchestrate repository loading and dispatch typed store actions.
+
 ### 2026-07-12 — Step 4
 
 Implemented:
@@ -1215,3 +1241,38 @@ Plan changes:
 - Reassessed Step 8: replace the loaded placeholder with the five-column table using the existing state-driven render path and stable word ids.
 - Reassessed Step 9: use the already-created chevron icon factory for interactive word cells.
 - Reassessed Step 10: upload controls already expose `data-action="load-word-set"` and can be wired to a hidden native JSON file input.
+
+### 2026-07-12 — Step 8
+
+Implemented:
+- Replaced the loaded placeholder with a data-driven semantic five-column vocabulary table.
+- Rendered headers `Слово`, `Транскрипция`, `Перевод`, `Пример`, and `Перевод примера`.
+- Applied column proportions `15 / 15 / 18 / 27 / 25` through table column widths.
+- Rendered word translations and example translations as real buttons with stable `data-word-id` hooks.
+- Added hidden/revealed mask classes with blurred hidden text, selectable revealed text, hover/focus states, and action-specific aria labels.
+- Added event delegation in app bootstrap for theme, global translation visibility, word translation, and example translation actions.
+- Kept imported strings safe by assigning `textContent` rather than injecting markup.
+- Added DOM coverage for table rendering, no markup injection, independent cell toggles, and global show/hide semantics.
+
+Verified:
+- `npm run typecheck`
+- passed
+- `npm run lint`
+- passed
+- `npm run test`
+- 8 test files passed, 38 tests passed
+- `npm run build`
+- passed and emitted `dist/index.html`
+- `npm run check`
+- passed
+- `find dist -maxdepth 1 -type f -print`
+- returned only `dist/index.html`
+- `rg -n "support\\.js|_ds_bundle|<x-dc|<sc-if|<sc-for|DCLogic" src dist/index.html --glob '!example/**' || true`
+- no matches
+- `rg -n "\\.[a-z][a-z0-9-]*__[a-z0-9-]" src/styles/index.css || true`
+- only `.app__dark`, the explicit theme modifier, was reported.
+
+Plan changes:
+- Reassessed Step 9: the first-cell word button and chevron are already present; the next step should wire `toggle-declension`, `aria-expanded`, and inline detail rows.
+- Reassessed Step 10: upload buttons still intentionally no-op; the existing event delegation should route `load-word-set` to a hidden native file input and import effect.
+- Reassessed Step 11: keyboard activation for translation masks uses native buttons, but focus preservation after rerender and non-clipped tooltips remain Step 11 concerns.

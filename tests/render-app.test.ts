@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
+import { attachAppEventHandlers } from '../src/app/bootstrap';
 import {
   INITIAL_UI_STATE,
   type IUiState,
   PAGE_PHASE,
   THEME_MODE,
+  uiReducer,
 } from '../src/features/ui-state/ui-state';
 import {
   GREEK_CASE,
@@ -12,6 +14,7 @@ import {
   type IWord,
   type IWordSet,
 } from '../src/features/word-sets/word-sets';
+import { createStore } from '../src/state/store';
 import { renderApp } from '../src/ui/render-app';
 
 describe('renderApp', () => {
@@ -55,7 +58,116 @@ describe('renderApp', () => {
     expect(root.querySelector('[data-action="toggle-all-translations"]')?.hasAttribute('disabled')).toBe(false);
     expect(root.querySelector('[data-action="toggle-all-translations"]')?.getAttribute('aria-label')).toBe('Показать все переводы');
   });
+
+  it('renders a data-driven five-column word table with hidden translation masks', () => {
+    const root = document.createElement('main');
+    const state: IUiState = {
+      ...INITIAL_UI_STATE,
+      phase: PAGE_PHASE.LOADED,
+      activeWordSetId: 'set-1',
+      wordSet: createWordSet(),
+    };
+
+    renderApp(root, state);
+
+    expect([...root.querySelectorAll('th')].map((cell) => cell.textContent)).toEqual([
+      'Слово',
+      'Транскрипция',
+      'Перевод',
+      'Пример',
+      'Перевод примера',
+    ]);
+    expect(root.querySelectorAll('tbody tr')).toHaveLength(2);
+    expect(root.querySelectorAll('col')).toHaveLength(5);
+    expect(root.querySelectorAll('button[data-action="toggle-word-translation"]')).toHaveLength(2);
+    expect(root.querySelectorAll('button[data-action="toggle-example-translation"]')).toHaveLength(2);
+    expect(root.querySelector('[data-word-id="word-1"]')?.textContent).toContain('λέξη word-1');
+    expect(root.querySelector('[data-action="toggle-word-translation"][data-word-id="word-1"]')?.classList.contains('_word-table-mask__hidden')).toBe(true);
+    expect(root.querySelector('[data-action="toggle-word-translation"][data-word-id="word-1"]')?.textContent).toBe('translation word-1');
+  });
+
+  it('assigns imported text without creating markup', () => {
+    const root = document.createElement('main');
+    const state: IUiState = {
+      ...INITIAL_UI_STATE,
+      phase: PAGE_PHASE.LOADED,
+      activeWordSetId: 'set-1',
+      wordSet: {
+        id: 'set-1',
+        name: 'Базовый набор',
+        words: [
+          {
+            ...createWord('word-1'),
+            translation: '<img src=x onerror=alert(1)>',
+          },
+        ],
+      },
+    };
+
+    renderApp(root, state);
+
+    expect(root.querySelector('img')).toBeNull();
+    expect(root.textContent).toContain('<img src=x onerror=alert(1)>');
+  });
+
+  it('dispatches independent translation toggles through stable word ids', () => {
+    const root = createInteractiveRoot();
+
+    getButton(root, '[data-action="toggle-word-translation"][data-word-id="word-1"]').click();
+
+    expect(getButton(root, '[data-action="toggle-word-translation"][data-word-id="word-1"]').classList.contains('_word-table-mask__revealed')).toBe(true);
+    expect(getButton(root, '[data-action="toggle-example-translation"][data-word-id="word-1"]').classList.contains('_word-table-mask__hidden')).toBe(true);
+
+    getButton(root, '[data-action="toggle-example-translation"][data-word-id="word-1"]').click();
+
+    expect(getButton(root, '[data-action="toggle-example-translation"][data-word-id="word-1"]').classList.contains('_word-table-mask__revealed')).toBe(true);
+    expect(getButton(root, '[data-action="toggle-word-translation"][data-word-id="word-2"]').classList.contains('_word-table-mask__hidden')).toBe(true);
+  });
+
+  it('uses the global translation toggle to show mixed rows and then hide all rows', () => {
+    const root = createInteractiveRoot();
+
+    getButton(root, '[data-action="toggle-word-translation"][data-word-id="word-1"]').click();
+    getButton(root, '[data-action="toggle-all-translations"]').click();
+
+    expect(root.querySelectorAll('._word-table-mask__revealed')).toHaveLength(4);
+    expect(getButton(root, '[data-action="toggle-all-translations"]').getAttribute('aria-label')).toBe('Скрыть все переводы');
+
+    getButton(root, '[data-action="toggle-all-translations"]').click();
+
+    expect(root.querySelectorAll('._word-table-mask__hidden')).toHaveLength(4);
+    expect(getButton(root, '[data-action="toggle-all-translations"]').getAttribute('aria-label')).toBe('Показать все переводы');
+  });
 });
+
+function createInteractiveRoot(): HTMLElement {
+  const root = document.createElement('main');
+  const state: IUiState = {
+    ...INITIAL_UI_STATE,
+    phase: PAGE_PHASE.LOADED,
+    activeWordSetId: 'set-1',
+    wordSet: createWordSet(),
+  };
+  const store = createStore(state, uiReducer);
+
+  attachAppEventHandlers(root, store);
+  renderApp(root, store.getState());
+  store.subscribe((nextState) => {
+    renderApp(root, nextState);
+  });
+
+  return root;
+}
+
+function getButton(root: HTMLElement, selector: string): HTMLButtonElement {
+  const button = root.querySelector(selector);
+
+  if (!(button instanceof HTMLButtonElement)) {
+    throw new Error(`Missing button for selector ${selector}`);
+  }
+
+  return button;
+}
 
 function createWordSet(): IWordSet {
   return {

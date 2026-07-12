@@ -19,11 +19,24 @@ export function bootstrapApp(): void {
     return;
   }
 
+  attachAppEventHandlers(appRoot, uiStore);
   renderApp(appRoot, uiStore.getState());
   uiStore.subscribe((state) => {
     renderApp(appRoot, state);
   });
   void restoreActiveWordSet(uiStore, createIndexedDbWordSetRepository());
+}
+
+export function attachAppEventHandlers(root: HTMLElement, store: IStore<IUiState, UiAction>): void {
+  root.addEventListener('click', (event) => {
+    const button = findActionButton(event.target);
+
+    if (button === null) {
+      return;
+    }
+
+    dispatchButtonAction(button, store);
+  });
 }
 
 export async function restoreActiveWordSet(
@@ -77,4 +90,60 @@ function createWordSetFromRecord(record: IPersistedWordSetRecord): IWordSet {
     name: record.name,
     words: record.words,
   };
+}
+
+function findActionButton(target: EventTarget | null): HTMLButtonElement | null {
+  if (!(target instanceof Element)) {
+    return null;
+  }
+
+  const button = target.closest('button[data-action]');
+
+  return button instanceof HTMLButtonElement ? button : null;
+}
+
+function dispatchButtonAction(button: HTMLButtonElement, store: IStore<IUiState, UiAction>): void {
+  const action = button.dataset['action'];
+  const wordId = button.dataset['wordId'];
+
+  switch (action) {
+    case 'toggle-theme':
+      store.dispatch({
+        type: UI_ACTION_TYPE.THEME_TOGGLED,
+      });
+      break;
+    case 'toggle-all-translations':
+      store.dispatch({
+        type: UI_ACTION_TYPE.GLOBAL_TRANSLATIONS_TOGGLED,
+      });
+      break;
+    case 'toggle-word-translation':
+      dispatchWordAction(wordId, store, UI_ACTION_TYPE.WORD_TRANSLATION_TOGGLED);
+      break;
+    case 'toggle-example-translation':
+      dispatchWordAction(wordId, store, UI_ACTION_TYPE.EXAMPLE_TRANSLATION_TOGGLED);
+      break;
+    case 'toggle-declension':
+    case 'load-word-set':
+      break;
+    case undefined:
+      break;
+    default:
+      break;
+  }
+}
+
+function dispatchWordAction(
+  wordId: string | undefined,
+  store: IStore<IUiState, UiAction>,
+  type: UI_ACTION_TYPE.WORD_TRANSLATION_TOGGLED | UI_ACTION_TYPE.EXAMPLE_TRANSLATION_TOGGLED,
+): void {
+  if (wordId === undefined) {
+    return;
+  }
+
+  store.dispatch({
+    type,
+    wordId,
+  });
 }
