@@ -1894,9 +1894,9 @@
     },
     {
       "id": "chartopetseta",
-      "word": "χαρτο\u00adπετσέτα",
+      "word": "χαρ\u00adτο\u00adπε\u00adτσέ\u00adτα",
       "transcription": "хартопэцэ́та",
-      "translation": "бумаж\u00adная сал\u00adфетка",
+      "translation": "бу\u00adмаж\u00adная сал\u00adфет\u00adка",
       "example": "Μπορώ να έχω μια χαρτοπετσέτα;",
       "exampleTranslation": "Можно мне бумажную салфетку?",
       "declensions": {
@@ -1964,9 +1964,9 @@
     },
     {
       "id": "kalamaki",
-      "word": "καλα\u00adμάκι",
+      "word": "κα\u00adλα\u00adμά\u00adκι",
       "transcription": "калама́ки",
-      "translation": "соло\u00adминка",
+      "translation": "со\u00adло\u00adмин\u00adка",
       "example": "Χωρίς καλαμάκι, παρακαλώ.",
       "exampleTranslation": "Без соломинки, пожалуйста.",
       "declensions": {
@@ -2034,9 +2034,9 @@
     },
     {
       "id": "diskos",
-      "word": "δίσκος",
+      "word": "δί\u00adσκος",
       "transcription": "ди́скос",
-      "translation": "поднос",
+      "translation": "под\u00adнос",
       "example": "Βάλτε τα ποτά στον δίσκο.",
       "exampleTranslation": "Поставьте напитки на поднос.",
       "declensions": {
@@ -2104,9 +2104,9 @@
     },
     {
       "id": "zachari",
-      "word": "ζάχαρη",
+      "word": "ζά\u00adχα\u00adρη",
       "transcription": "за́хари",
-      "translation": "сахар",
+      "translation": "са\u00adхар",
       "example": "Χωρίς ζάχαρη, παρακαλώ.",
       "exampleTranslation": "Без сахара, пожалуйста.",
       "declensions": {
@@ -2174,7 +2174,7 @@
     },
     {
       "id": "alati",
-      "word": "αλάτι",
+      "word": "α\u00adλά\u00adτι",
       "transcription": "ала́ти",
       "translation": "соль",
       "example": "Λίγο αλάτι, παρακαλώ.",
@@ -2244,9 +2244,9 @@
     },
     {
       "id": "piperi",
-      "word": "πιπέρι",
+      "word": "πι\u00adπέ\u00adρι",
       "transcription": "пипэ́ри",
-      "translation": "перец; при\u00adправа",
+      "translation": "пе\u00adрец; при\u00adпра\u00adва",
       "example": "Χωρίς πιπέρι, παρακαλώ.",
       "exampleTranslation": "Без перца, пожалуйста.",
       "declensions": {
@@ -2314,9 +2314,9 @@
     },
     {
       "id": "nero",
-      "word": "νερό",
+      "word": "νε\u00adρό",
       "transcription": "нэро́",
-      "translation": "вода",
+      "translation": "во\u00adда",
       "example": "Ένα νερό χωρίς πάγο, παρακαλώ.",
       "exampleTranslation": "Воду безо льда, пожалуйста.",
       "declensions": {
@@ -2384,9 +2384,9 @@
     },
     {
       "id": "kafes",
-      "word": "καφές",
+      "word": "κα\u00adφές",
       "transcription": "кафэ́с",
-      "translation": "кофе",
+      "translation": "ко\u00adфе",
       "example": "Έναν καφέ χωρίς ζάχαρη, παρακαλώ.",
       "exampleTranslation": "Кофе без сахара, пожалуйста.",
       "declensions": {
@@ -2454,7 +2454,7 @@
     },
     {
       "id": "tsai",
-      "word": "τσάι",
+      "word": "τσά\u00adι",
       "transcription": "ца́и",
       "translation": "чай",
       "example": "Ένα τσάι με λεμόνι, παρακαλώ.",
@@ -2524,7 +2524,7 @@
     },
     {
       "id": "chymos",
-      "word": "χυμός",
+      "word": "χυ\u00adμός",
       "transcription": "химо́с",
       "translation": "сок",
       "example": "Θα ήθελα έναν χυμό πορτοκάλι.",
@@ -2594,7 +2594,7 @@
     },
     {
       "id": "psomi",
-      "word": "ψωμί",
+      "word": "ψω\u00adμί",
       "transcription": "псоми́",
       "translation": "хлеб",
       "example": "Έχετε φρέσκο ψωμί;",
@@ -2664,7 +2664,7 @@
     },
     {
       "id": "tyri",
-      "word": "τυρί",
+      "word": "τυ\u00adρί",
       "transcription": "тири́",
       "translation": "сыр",
       "example": "Αυτό το σάντουιτς έχει τυρί;",
@@ -2734,9 +2734,9 @@
     },
     {
       "id": "avgo",
-      "word": "αυγό",
+      "word": "αυ\u00adγό",
       "transcription": "авго́",
-      "translation": "яйцо",
+      "translation": "яй\u00adцо",
       "example": "Θα ήθελα δύο βραστά αυγά.",
       "exampleTranslation": "Я хотел бы два варёных яйца.",
       "declensions": {
@@ -2804,9 +2804,9 @@
     },
     {
       "id": "psari",
-      "word": "ψάρι",
+      "word": "ψά\u00adρι",
       "transcription": "пса́ри",
-      "translation": "рыба",
+      "translation": "ры\u00adба",
       "example": "Ποιο ψάρι είναι φρέσκο σήμερα;",
       "exampleTranslation": "Какая рыба сегодня свежая?",
       "declensions": {
@@ -2874,9 +2874,9 @@
     },
     {
       "id": "kreas",
-      "word": "κρέας",
+      "word": "κρέ\u00adας",
       "transcription": "кре́ас",
-      "translation": "мясо",
+      "translation": "мя\u00adсо",
       "example": "Δεν τρώω κρέας.",
       "exampleTranslation": "Я не ем мясо.",
       "declensions": {
@@ -2944,9 +2944,9 @@
     },
     {
       "id": "choirino",
-      "word": "χοι\u00adρινό",
+      "word": "χοι\u00adρι\u00adνό",
       "transcription": "хирино́",
-      "translation": "сви\u00adнина",
+      "translation": "сви\u00adни\u00adна",
       "example": "Θα πάρω το χοιρινό με πατάτες.",
       "exampleTranslation": "Я возьму свинину с картофелем.",
       "declensions": {
@@ -3014,9 +3014,9 @@
     },
     {
       "id": "moschari",
-      "word": "μο\u00adσχάρι",
+      "word": "μο\u00adσχά\u00adρι",
       "transcription": "мосха́ри",
-      "translation": "говя\u00adдина; теля\u00adтина",
+      "translation": "го\u00adвя\u00adди\u00adна; те\u00adля\u00adти\u00adна",
       "example": "Είναι το μοσχάρι μαλακό;",
       "exampleTranslation": "Говядина мягкая?",
       "declensions": {
@@ -3084,9 +3084,9 @@
     },
     {
       "id": "salata",
-      "word": "σαλάτα",
+      "word": "σα\u00adλά\u00adτα",
       "transcription": "сала́та",
-      "translation": "салат",
+      "translation": "са\u00adлат",
       "example": "Μια σαλάτα χωρίς κρεμμύδι, παρακαλώ.",
       "exampleTranslation": "Салат без лука, пожалуйста.",
       "declensions": {
@@ -3154,7 +3154,7 @@
     },
     {
       "id": "santouits",
-      "word": "σάντου\u00adιτς",
+      "word": "σάν\u00adτου\u00adιτς",
       "transcription": "са́ндуиц",
       "translation": "сэнд\u00adвич",
       "example": "Ένα σάντουιτς για έξω, παρακαλώ.",
@@ -3224,9 +3224,9 @@
     },
     {
       "id": "glyko",
-      "word": "γλυκό",
+      "word": "γλυ\u00adκό",
       "transcription": "глико́",
-      "translation": "десерт; слад\u00adкое",
+      "translation": "де\u00adсерт; слад\u00adкое",
       "example": "Ποιο γλυκό προτείνετε;",
       "exampleTranslation": "Какой десерт вы рекомендуете?",
       "declensions": {
@@ -3294,9 +3294,9 @@
     },
     {
       "id": "pagoto",
-      "word": "παγωτό",
+      "word": "πα\u00adγω\u00adτό",
       "transcription": "пагото́",
-      "translation": "моро\u00adженое",
+      "translation": "мо\u00adро\u00adже\u00adное",
       "example": "Ένα παγωτό σοκολάτα, παρακαλώ.",
       "exampleTranslation": "Шоколадное мороженое, пожалуйста.",
       "declensions": {
@@ -3364,9 +3364,9 @@
     },
     {
       "id": "vafla",
-      "word": "βάφλα",
+      "word": "βά\u00adφλα",
       "transcription": "ва́фла",
-      "translation": "вафля",
+      "translation": "ваф\u00adля",
       "example": "Μια βάφλα με σοκολάτα, παρακαλώ.",
       "exampleTranslation": "Вафлю с шоколадом, пожалуйста.",
       "declensions": {
@@ -3434,9 +3434,9 @@
     },
     {
       "id": "krouasan",
-      "word": "κρου\u00adασάν",
+      "word": "κρου\u00adα\u00adσάν",
       "transcription": "круаса́н",
-      "translation": "кру\u00adассан",
+      "translation": "кру\u00adас\u00adсан",
       "example": "Ένα κρουασάν βουτύρου, παρακαλώ.",
       "exampleTranslation": "Круассан с маслом, пожалуйста.",
       "declensions": {
