@@ -335,7 +335,7 @@ Introduce precise TypeScript contracts and validation for imported word-set JSON
 
 ## Step 3 — Implement The Flux Store Kernel
 
-**Status:** [ ]
+**Status:** [x]
 
 ### Goal
 
@@ -390,12 +390,12 @@ Create a small typed Flux store with pure reducers, subscriptions, and determini
 
 ### Definition Of Done
 
-- [ ] The generic store works and has deterministic tests.
-- [ ] All UI transitions are represented as typed actions.
-- [ ] Reducers are pure and exhaustive.
-- [ ] Stable ids are used for row state.
-- [ ] Global and individual reveal semantics are documented by tests.
-- [ ] The step record includes test results.
+- [x] The generic store works and has deterministic tests.
+- [x] All UI transitions are represented as typed actions.
+- [x] Reducers are pure and exhaustive.
+- [x] Stable ids are used for row state.
+- [x] Global and individual reveal semantics are documented by tests.
+- [x] The step record includes test results.
 
 ---
 
@@ -1092,3 +1092,31 @@ Plan changes:
 - Reassessed Step 4: persistence can store only UI state ids and does not need to serialize word-set contents.
 - Reassessed Step 5: IndexedDB records should use the exported `IPersistedWordSetRecord` shape and store validated `IWordSet.words`.
 - No changes to `AGENTS.md`; the required next-three-step reassessment rule is already present there.
+
+### 2026-07-12 — Step 3
+
+Implemented:
+- Added a generic typed store with `getState`, `dispatch`, and `subscribe`.
+- Added UI state, typed UI actions, `INITIAL_UI_STATE`, and an exhaustive pure reducer.
+- Added transient active `wordSet` state alongside the persisted UI fields needed by later steps.
+- Implemented theme, bootstrap, import, invalid-active-set clearing, per-cell translation reveal, global translation reveal, and declension expansion transitions.
+- Defined global translation semantics: global show fills both reveal id sets for current words; global hide clears both reveal id sets.
+- Added stale word-id reconciliation when a loaded word set is applied during bootstrap.
+- Added deterministic store and reducer tests.
+
+Verified:
+- `npm run typecheck`
+- passed
+- `npm run lint`
+- passed
+- `npm run test`
+- 4 test files passed, 19 tests passed
+- `npm run check`
+- passed
+- `rg -n "document|localStorage|indexedDB|setTimeout|setInterval|Date\\.|new Date|Math\\.random|crypto" src/features/ui-state src/state --glob '*.ts' || true`
+- no matches
+
+Plan changes:
+- Reassessed Step 4: persistence must serialize `ReadonlySet<string>` UI collections as validated id arrays, exclude transient `phase`, `errorMessage`, and `wordSet`, then hydrate back to sets.
+- Reassessed Step 5: IndexedDB repository remains responsible only for validated word-set records; reducer/store do not import IndexedDB.
+- Reassessed Step 6: bootstrap orchestration should dispatch `BOOTSTRAP_STARTED`, then `BOOTSTRAP_SUCCEEDED` with `IWordSet | null`, `BOOTSTRAP_FAILED`, or `INVALID_ACTIVE_SET_CLEARED` for missing active records.
