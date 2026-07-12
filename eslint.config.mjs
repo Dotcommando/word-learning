@@ -18,6 +18,7 @@ export default [
       'coverage/**',
       'node_modules/**',
       '.tmp/**',
+      'example/**',
       'e2e/local-registry/consumer/src/**/*.ts',
     ],
   },

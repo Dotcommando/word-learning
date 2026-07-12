@@ -1,0 +1,21 @@
+{
+  "name": "word-learning",
+  "version": "0.1.0",
+  "author": "Mikhail Filchushkin <spectralane@pm.me>",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "lint": "eslint ."
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@stylistic/eslint-plugin": "5.10.0",
+    "@typescript-eslint/eslint-plugin": "8.63.0",
+    "@typescript-eslint/parser": "8.63.0",
+    "eslint": "10.7.0",
+    "eslint-plugin-simple-import-sort": "13.0.0",
+    "globals": "17.7.0",
+    "typescript": "5.9.3"
+  }
+}
