@@ -856,7 +856,7 @@ Finish empty, loading, loaded, and error states and make every interaction usabl
 
 ## Step 12 — Responsive And Visual Fidelity Pass
 
-**Status:** [ ]
+**Status:** [x]
 
 ### Goal
 
@@ -899,12 +899,12 @@ Bring the implementation into close visual agreement with the Claude Design scre
 
 ### Definition Of Done
 
-- [ ] All four target width ranges are verified.
-- [ ] Both themes are verified.
-- [ ] The table remains readable on narrow screens.
-- [ ] Declension regions adapt from two columns to one.
-- [ ] Visual discrepancies have been recorded and resolved.
-- [ ] Comparison screenshots or equivalent evidence are referenced in the progress log.
+- [x] All four target width ranges are verified.
+- [x] Both themes are verified.
+- [x] The table remains readable on narrow screens.
+- [x] Declension regions adapt from two columns to one.
+- [x] Visual discrepancies have been recorded and resolved.
+- [x] Comparison screenshots or equivalent evidence are referenced in the progress log.
 
 ---
 
@@ -1380,3 +1380,56 @@ Plan changes:
 - Reassessed Step 12: responsive/visual pass can now focus on measurable layout and fidelity gaps rather than missing accessibility primitives.
 - Reassessed Step 13: final verification should rerun keyboard navigation and import/reload smoke checks after visual adjustments.
 - Reassessed Step 14: documentation/final notes should mention that no dedicated a11y audit package is installed unless one is added later.
+
+### 2026-07-12 — Step 12
+
+Implemented:
+- Compared the implementation against the reference `.dc.html`, design-system CSS, and `example/.thumbnail`.
+- Confirmed reference container breakpoints: `760px`, `920px`, `1080px`, and `1240px`.
+- Confirmed and retained warm light/dark theme tokens.
+- Adjusted table fidelity to the reference:
+  - table minimum width changed to `680px`;
+  - table surface mix aligned to the reference `55%` surface blend;
+  - headers changed to compact uppercase `10.5px` text with `0.13em` letter spacing;
+  - row padding, hover strength, and cell text sizing aligned with reference measurements.
+- Adjusted translation masks to match the reference inline pill behavior:
+  - blur moved onto an inner text span;
+  - hidden blur set to `6px`;
+  - revealed state keeps text selectable without the pill background.
+- Adjusted word-cell typography, hover state, chevron color, and word-cell tooltip position.
+- Adjusted declension fidelity:
+  - added the `Склонение · <word>` kickline;
+  - aligned singular/plural grid gap and headings;
+  - added per-entry separators and reference-like case/form/example typography;
+  - kept one-column layout below `992px` and two columns at/above `992px`.
+
+Verified:
+- `npm run typecheck`
+- passed
+- `npm run lint`
+- passed
+- `npm run test`
+- 9 test files passed, 50 tests passed
+- `npm run build`
+- passed and emitted `dist/index.html`
+- `npm run check`
+- passed
+- `npm ls playwright @playwright/test puppeteer --depth=0 || true`
+- no browser screenshot tooling is installed in the workspace
+- `which chromium || which chromium-browser || which google-chrome || which chrome || which playwright || which puppeteer || true`
+- no system browser CLI or screenshot tool was available
+- `view_image example/.thumbnail`
+- reference thumbnail reviewed for composition, visible table density, toolbar position, and warm palette
+- `rg -n -- "--container-width: 760px|--container-width: 920px|--container-width: 1080px|--container-width: 1240px|min-width: 680px|filter: blur\\(6px\\)|grid-template-columns: repeat\\(2|min-width: 992px|overflow-x: auto|width: calc\\(100% - 32px\\)|#251f18|#ece3d4|#f3f2f2" src/styles/index.css`
+- confirmed target breakpoints, narrow-table scroll behavior, mask blur, two-column declension breakpoint, wrap width, and theme tokens
+- `rg -n "font-size: 10\\.5px|letter-spacing: 0\\.13em|text-transform: uppercase|padding: 15px 16px|background: color-mix\\(in srgb, var\\(--color-surface\\) 55%|_word-table-mask-text|_declension-kick|_declension-grid|grid-template-columns: 56px" src/styles/index.css src/ui/templates.ts`
+- confirmed reference-aligned header density, cell padding, table surface, inline mask text span, and declension layout hooks
+- `find dist -maxdepth 1 -type f -print`
+- returned only `dist/index.html`
+- `rg -n "support\\.js|_ds_bundle|<x-dc|<sc-if|<sc-for|DCLogic" src dist/index.html --glob '!example/**' || true`
+- no matches
+
+Plan changes:
+- Reassessed Step 13: final production build verification should remain mostly contract-focused because screenshot tooling is unavailable unless added.
+- Reassessed Step 14: final handoff should explicitly mention that visual evidence used static reference metrics and thumbnail review rather than captured browser screenshots.
+- No scope change; `example/` remains reference-only and unmodified.

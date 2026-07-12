@@ -359,13 +359,16 @@ function createDeclensionRow(word: IWord): HTMLTableRowElement {
 
 function createDeclensionRegion(word: IWord): HTMLElement {
   const region = createElement('section', 'declension');
+  const kick = createElement('p', '_declension-kick', `Склонение · ${word.word}`);
+  const grid = createElement('div', '_declension-grid');
 
   region.id = createDeclensionRegionId(word.id);
   region.setAttribute('aria-label', `Склонение слова ${word.word}`);
-  region.append(
+  grid.append(
     createDeclensionGroup(SINGULAR_DECLENSION_LABEL, word.declensions.singular, GRAMMATICAL_NUMBER.SINGULAR),
     createDeclensionGroup(PLURAL_DECLENSION_LABEL, word.declensions.plural, GRAMMATICAL_NUMBER.PLURAL),
   );
+  region.append(kick, grid);
 
   return region;
 }
@@ -444,6 +447,7 @@ interface ITranslationCellOptions {
 function createTranslationCell(options: ITranslationCellOptions): HTMLTableCellElement {
   const cell = document.createElement('td');
   const button = document.createElement('button');
+  const text = createElement('span', '_word-table-mask-text', options.text);
 
   cell.className = '_word-table-cell _word-table-cell__translation';
   button.className = options.isRevealed
@@ -454,7 +458,7 @@ function createTranslationCell(options: ITranslationCellOptions): HTMLTableCellE
   button.dataset['wordId'] = options.wordId;
   button.dataset['focusKey'] = `${options.action}-${options.wordId}`;
   button.setAttribute('aria-label', options.isRevealed ? options.visibleLabel : options.hiddenLabel);
-  button.textContent = options.text;
+  button.append(text);
   cell.append(button);
 
   return cell;
