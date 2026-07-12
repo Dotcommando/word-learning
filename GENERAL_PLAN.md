@@ -515,7 +515,7 @@ Persist imported word sets in IndexedDB behind a focused repository.
 
 ## Step 6 — Implement Bootstrap And Active-Set Restoration
 
-**Status:** [ ]
+**Status:** [x]
 
 ### Goal
 
@@ -552,11 +552,11 @@ Connect the persisted UI state and IndexedDB repository during application start
 
 ### Definition Of Done
 
-- [ ] Reload can restore the active imported set.
-- [ ] Missing records degrade safely to empty state.
-- [ ] Startup failures are visible and non-destructive.
-- [ ] Reconciliation uses stable word ids.
-- [ ] Bootstrap tests pass.
+- [x] Reload can restore the active imported set.
+- [x] Missing records degrade safely to empty state.
+- [x] Startup failures are visible and non-destructive.
+- [x] Reconciliation uses stable word ids.
+- [x] Bootstrap tests pass.
 
 ---
 
@@ -1179,3 +1179,33 @@ Plan changes:
 - Reassessed Step 6: bootstrap can instantiate/use the repository, dispatch typed failure state from repository errors, and treat `getById` success with `null` as invalid active-set clearing.
 - Reassessed Step 7: static rendering remains independent of IndexedDB and should read loaded data only from UI store state.
 - Reassessed Step 8: table rendering can rely on validated `IWordSet.words` and stable word ids produced before persistence.
+
+### 2026-07-12 — Step 6
+
+Implemented:
+- Added `restoreActiveWordSet` bootstrap effect that connects the hydrated UI store with the IndexedDB word-set repository.
+- Updated application bootstrap to render the current shell and start active-set restoration.
+- Dispatches `BOOTSTRAP_STARTED` before restoration work.
+- Dispatches empty bootstrap success when there is no active id.
+- Loads a persisted active record and dispatches loaded bootstrap success with `IWordSet`.
+- Clears invalid active ids when the repository returns no record.
+- Dispatches visible bootstrap failure state when the repository returns a typed error.
+- Preserves reducer-owned stale-id reconciliation for revealed translations and expanded rows.
+- Added bootstrap restoration tests for no active id, valid active record, missing record, repository failure, and stale row id cleanup.
+
+Verified:
+- `npm run typecheck`
+- passed
+- `npm run lint`
+- passed
+- `npm run test`
+- 7 test files passed, 31 tests passed
+- `npm run check`
+- passed
+- `rg -n "localStorage|sessionStorage|indexedDB|createIndexedDbWordSetRepository" src/features src/ui src/state --glob '*.ts' || true`
+- reducers/renderers do not import IndexedDB; storage access remains isolated to persistence setup/adapter files.
+
+Plan changes:
+- Reassessed Step 7: static rendering should subscribe to the restored UI state and render phase-aware shell regions without adding import behavior yet.
+- Reassessed Step 8: loaded table rendering can rely on `state.wordSet` after bootstrap success.
+- Reassessed Step 9: declension expansion state already supports multiple stable word ids and should be wired through DOM controls.
