@@ -178,7 +178,7 @@ The task is complete when:
 
 ## Step 0 — Audit The Workspace And Freeze The Reference
 
-**Status:** [ ]
+**Status:** [x]
 
 ### Goal
 
@@ -213,11 +213,11 @@ Understand the current repository, locate all Claude Design reference files unde
 
 ### Definition Of Done
 
-- [ ] Every relevant file under `example/` has been identified.
-- [ ] The visual measurements and interaction rules are documented.
-- [ ] Existing repository tooling has been assessed.
-- [ ] The next three steps have been reassessed and remain executable.
-- [ ] `GENERAL_PLAN.md` contains an audit entry.
+- [x] Every relevant file under `example/` has been identified.
+- [x] The visual measurements and interaction rules are documented.
+- [x] Existing repository tooling has been assessed.
+- [x] The next three steps have been reassessed and remain executable.
+- [x] `GENERAL_PLAN.md` contains an audit entry.
 
 ---
 
@@ -966,7 +966,7 @@ Also inspect the final document for forbidden runtime references.
 
 ## Step 14 — Final Review And Handoff
 
-**Status:** [ ]
+**Status:** [x]
 
 ### Goal
 
@@ -1005,12 +1005,12 @@ Leave the repository in a finished, understandable, and verifiable state.
 
 ### Definition Of Done
 
-- [ ] Every completed step is checked.
-- [ ] Final verification commands and results are recorded.
-- [ ] No temporary artifacts remain.
-- [ ] `example/` is unchanged.
-- [ ] Known limitations are explicit.
-- [ ] The repository is ready for the next planned feature.
+- [x] Every completed step is checked.
+- [x] Final verification commands and results are recorded.
+- [x] No temporary artifacts remain.
+- [x] `example/` is unchanged.
+- [x] Known limitations are explicit.
+- [x] The repository is ready for the next planned feature.
 
 ---
 
@@ -1472,3 +1472,75 @@ Plan changes:
 - Reassessed Step 14: final review should note that direct browser `file://` interaction was not programmatically exercised because no browser CLI is available, but the output is self-contained and static-server smoke passed.
 - Reassessed Step 14: final verification should include a last source/runtime grep, git status review, and `example/` unchanged check.
 - Reassessed future styling work: keep document-level theme background synchronization because browser/devtools or viewport gutters can expose space outside the application root.
+
+### 2026-07-12 — Step 0
+
+Implemented:
+- Completed a final reference audit and closed the stale Step 0 status.
+- Identified all relevant reference files under `example/`:
+  - `example/Греческие слова.dc.html`;
+  - `example/.thumbnail`;
+  - `example/support.js`;
+  - `example/_ds/classical-7a25e2ab-fdc5-44b0-b323-254f2176d0f4/_ds_bundle.js`;
+  - `example/_ds/classical-7a25e2ab-fdc5-44b0-b323-254f2176d0f4/styles.css`;
+  - `example/_ds/classical-7a25e2ab-fdc5-44b0-b323-254f2176d0f4/_ds_manifest.json`;
+  - `example/_ds/classical-7a25e2ab-fdc5-44b0-b323-254f2176d0f4/_adherence.oxlintrc.json`;
+  - `example/_ds/classical-7a25e2ab-fdc5-44b0-b323-254f2176d0f4/readme.md`.
+- Reconfirmed the visual contracts used by the implementation: title `Λέξεις`, the Russian subtitle, five table columns, `15 / 15 / 18 / 27 / 25` proportions, `760 / 920 / 1080 / 1240` container widths, warm light and dark tokens, blurred translation masks, inline declension expansion, and empty/loading/error shells.
+- Reconfirmed that Claude Design runtime artifacts are reference-only and not production dependencies: `<x-dc>`, `<sc-if>`, `<sc-for>`, `DCLogic`, `support.js`, and `_ds_bundle.js`.
+- Assessed current repository tooling as Vite, strict TypeScript, ESLint, Vitest/jsdom, IndexedDB tests through `fake-indexeddb`, and the single-file build assertion.
+
+Verified:
+- `find example -maxdepth 3 -type f -print | sort`
+- returned the reference `.dc.html`, thumbnail, support runtime, design-system bundle, manifest, CSS, readme, and adherence config
+- `rg -n "Λέξεις|Тренаж|Слово|Транскрипция|Перевод|support\\.js|_ds_bundle|x-dc|sc-if|sc-for|DCLogic" example -g '!*.png'`
+- confirmed the reference content and generated runtime markers
+- `rg -n "^## Step|^\\*\\*Status:\\*\\*" GENERAL_PLAN.md`
+- found Step 0 as the only stale completed phase before this correction
+
+Plan changes:
+- Marked Step 0 complete based on the recorded final audit.
+- Reassessed Steps 1, 2, and 3 retrospectively; their implemented contracts remain aligned with the audited reference and current project scope.
+- No durable rule was added to `AGENTS.md`; the workflow already requires reference inspection and next-three-step reassessment.
+
+### 2026-07-12 — Step 14
+
+Implemented:
+- Reviewed the final repository state for scope compliance and stale plan entries.
+- Removed the root `.DS_Store` temporary file.
+- Confirmed `example/` has no modifications.
+- Confirmed the production build still emits exactly `dist/index.html`.
+- Confirmed no Claude Design runtime references, `example/` paths, source TypeScript/CSS asset paths, or local runtime assets remain in the distributable.
+- Marked Step 14 complete and recorded final verification, known limitations, and deferred non-goals.
+
+Verified:
+- `git status --short`
+- clean before the Step 14 plan update
+- `git status --short example && git diff -- example`
+- no output; `example/` is unchanged
+- `find . -maxdepth 3 -type f \( -name '*.tmp' -o -name '*.bak' -o -name '.DS_Store' -o -name '*.log' \) -print`
+- no output after removing `.DS_Store`
+- `npm run check`
+- passed; typecheck passed, ESLint passed, 9 test files passed, 50 tests passed, production build passed
+- `npm run build`
+- passed and emitted `dist/index.html`
+- `find dist -maxdepth 2 -type f -print`
+- returned only `dist/index.html`
+- `wc -c dist/index.html && gzip -c dist/index.html | wc -c`
+- `40583` bytes uncompressed, `11339` bytes gzipped
+- `rg -n "support\\.js|_ds_bundle|<x-dc|<sc-if|<sc-for|DCLogic|example/|src/.*\\.ts|src/.*\\.css" src dist/index.html --glob '!example/**' || true`
+- no matches
+- `git diff --check`
+- no whitespace errors
+
+Known limitations:
+- Browser screenshot tooling and a system browser CLI are not installed in this workspace, so final visual verification uses reference metrics, source inspection, the reference thumbnail review, and automated DOM/unit coverage rather than fresh Playwright screenshots.
+- Direct `file://` interaction was not programmatically exercised; the file is self-contained and was previously smoke-tested through a local static server.
+
+Deferred non-goals:
+- Word-set picker/library UI.
+- Editing, deleting, renaming, exporting, CSV import, remote loading, authentication, grammar generation, spaced repetition, and progress statistics.
+
+Plan changes:
+- The implementation phase is complete; no next implementation steps remain in `GENERAL_PLAN.md`.
+- `AGENTS.md` did not need changes because no new durable workflow rule emerged.
