@@ -8,9 +8,15 @@ import {
   type IPersistedWordSetRecord,
   type IWordSet,
 } from '../features/word-sets/domain';
+import { type IFileTextReader, importWordSetFile } from '../features/word-sets/import-word-set';
 import { createIndexedDbWordSetRepository, type IWordSetRepository } from '../persistence/indexed-db';
 import type { IStore } from '../state/store';
 import { renderApp } from '../ui/render-app';
+
+export interface IAppEventHandlerOptions {
+  readFileText?: IFileTextReader;
+  repository: IWordSetRepository;
+}
 
 export function bootstrapApp(): void {
   const appRoot = document.querySelector('[data-app-root]');
@@ -19,15 +25,25 @@ export function bootstrapApp(): void {
     return;
   }
 
-  attachAppEventHandlers(appRoot, uiStore);
+  const repository = createIndexedDbWordSetRepository();
+
+  attachAppEventHandlers(appRoot, uiStore, {
+    repository,
+  });
   renderApp(appRoot, uiStore.getState());
   uiStore.subscribe((state) => {
     renderApp(appRoot, state);
   });
-  void restoreActiveWordSet(uiStore, createIndexedDbWordSetRepository());
+  void restoreActiveWordSet(uiStore, repository);
 }
 
-export function attachAppEventHandlers(root: HTMLElement, store: IStore<IUiState, UiAction>): void {
+export function attachAppEventHandlers(
+  root: HTMLElement,
+  store: IStore<IUiState, UiAction>,
+  options: IAppEventHandlerOptions,
+): void {
+  let currentImportOperation = 0;
+
   root.addEventListener('click', (event) => {
     const button = findActionButton(event.target);
 
@@ -35,7 +51,36 @@ export function attachAppEventHandlers(root: HTMLElement, store: IStore<IUiState
       return;
     }
 
-    dispatchButtonAction(button, store);
+    dispatchButtonAction(button, root, store);
+  });
+  root.addEventListener('change', (event) => {
+    const input = findWordSetFileInput(event.target);
+
+    if (input === null) {
+      return;
+    }
+
+    const file = input.files?.item(0) ?? null;
+
+    if (file === null) {
+      input.value = '';
+
+      return;
+    }
+
+    currentImportOperation += 1;
+
+    const importOperation = currentImportOperation;
+
+    void importWordSetFile({
+      file,
+      isCurrentOperation: () => importOperation === currentImportOperation,
+      ...(options.readFileText === undefined ? {} : { readFileText: options.readFileText }),
+      repository: options.repository,
+      store,
+    }).finally(() => {
+      input.value = '';
+    });
   });
 }
 
@@ -102,7 +147,7 @@ function findActionButton(target: EventTarget | null): HTMLButtonElement | null 
   return button instanceof HTMLButtonElement ? button : null;
 }
 
-function dispatchButtonAction(button: HTMLButtonElement, store: IStore<IUiState, UiAction>): void {
+function dispatchButtonAction(button: HTMLButtonElement, root: HTMLElement, store: IStore<IUiState, UiAction>): void {
   const action = button.dataset['action'];
   const wordId = button.dataset['wordId'];
 
@@ -127,11 +172,26 @@ function dispatchButtonAction(button: HTMLButtonElement, store: IStore<IUiState,
       dispatchDeclensionAction(wordId, store);
       break;
     case 'load-word-set':
+      openWordSetFilePicker(root);
       break;
     case undefined:
       break;
     default:
       break;
+  }
+}
+
+function findWordSetFileInput(target: EventTarget | null): HTMLInputElement | null {
+  return target instanceof HTMLInputElement && target.dataset['wordSetFileInput'] === 'true'
+    ? target
+    : null;
+}
+
+function openWordSetFilePicker(root: HTMLElement): void {
+  const input = root.querySelector('[data-word-set-file-input="true"]');
+
+  if (input instanceof HTMLInputElement) {
+    input.click();
   }
 }
 

@@ -743,7 +743,7 @@ Implement the interactive word cell and inline singular/plural declension sectio
 
 ## Step 10 — Implement Real JSON Import And IndexedDB Save
 
-**Status:** [ ]
+**Status:** [x]
 
 ### Goal
 
@@ -792,13 +792,13 @@ Replace the reference's simulated upload with a real file-selection, validation,
 
 ### Definition Of Done
 
-- [ ] Both upload entry points open the native file picker.
-- [ ] Valid files are validated and persisted.
-- [ ] Invalid files show useful errors and save nothing.
-- [ ] The previous set survives a failed import.
-- [ ] Successful import resets per-word UI state safely.
-- [ ] Reload restores the new active set.
-- [ ] Automated coverage exists for success and failure paths.
+- [x] Both upload entry points open the native file picker.
+- [x] Valid files are validated and persisted.
+- [x] Invalid files show useful errors and save nothing.
+- [x] The previous set survives a failed import.
+- [x] Successful import resets per-word UI state safely.
+- [x] Reload restores the new active set.
+- [x] Automated coverage exists for success and failure paths.
 
 ---
 
@@ -1310,3 +1310,37 @@ Plan changes:
 - Reassessed Step 10: file import can reuse the existing delegated action path but should add a real hidden native file input and an import effect/service instead of expanding renderer responsibility.
 - Reassessed Step 11: tooltips and focus preservation remain relevant because full rerender can replace focused controls after import and reveal actions.
 - Reassessed Step 12: visual comparison must include expanded declension rows in both themes and at the target responsive widths.
+
+### 2026-07-12 — Step 10
+
+Implemented:
+- Added a native hidden JSON file input with `accept="application/json,.json"` controlled by both upload buttons.
+- Routed `load-word-set` clicks through app event delegation to the native file picker.
+- Added `change` handling for selected files that dispatches import start, reads file text, validates JSON, saves the validated word set to IndexedDB, and dispatches import success.
+- Added `importWordSetFile` as an async import effect/service so file reading, validation, and persistence stay out of reducers and renderers.
+- Preserved the previous loaded set on failed replacement imports and displayed the failure message above the table.
+- Reset the file input value after import attempts so selecting the same file again can trigger another import.
+- Defined latest-operation behavior: every file selection increments an operation id; stale operations may finish reading but are ignored before save or UI mutation when superseded.
+- Reused existing reducer semantics so successful imports activate the new set and clear revealed/expanded per-word UI state.
+- Added tests for native input control, valid import save/activation, malformed JSON, invalid JSON, save failure, stale operation ignoring, previous set preservation, and same-file retry.
+
+Verified:
+- `npm run typecheck`
+- passed
+- `npm run lint`
+- passed
+- `npm run test`
+- 9 test files passed, 48 tests passed
+- `npm run build`
+- passed and emitted `dist/index.html`
+- `npm run check`
+- passed
+- `find dist -maxdepth 1 -type f -print`
+- returned only `dist/index.html`
+- `rg -n "support\\.js|_ds_bundle|<x-dc|<sc-if|<sc-for|DCLogic" src dist/index.html --glob '!example/**' || true`
+- no matches
+
+Plan changes:
+- Reassessed Step 11: focus preservation after file import and rerender is now concrete work; the upload buttons and file input need final accessibility polish.
+- Reassessed Step 12: visual checks should include loaded error banners after failed replacement import.
+- Reassessed Step 13: final build verification should include a real import/reload smoke path now that IndexedDB and UI import are connected.

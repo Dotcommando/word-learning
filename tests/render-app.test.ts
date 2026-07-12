@@ -11,9 +11,11 @@ import {
 import {
   GREEK_CASE,
   type IDeclensionEntry,
+  type IPersistedWordSetRecord,
   type IWord,
   type IWordSet,
 } from '../src/features/word-sets/word-sets';
+import type { IWordSetRepository } from '../src/persistence/indexed-db';
 import { createStore } from '../src/state/store';
 import { renderApp } from '../src/ui/render-app';
 
@@ -29,6 +31,45 @@ describe('renderApp', () => {
     expect(root.textContent).toContain('Загрузите набор слов, чтобы начать обучение');
     expect(root.querySelectorAll('button[aria-label]')).toHaveLength(3);
     expect(root.querySelector('[data-action="toggle-all-translations"]')?.hasAttribute('disabled')).toBe(true);
+  });
+
+  it('renders one hidden JSON file input controlled by both upload entry points', () => {
+    const root = createInteractiveRoot(INITIAL_UI_STATE);
+    const fileInput = getInput(root, '[data-word-set-file-input="true"]');
+    const loadButtons = root.querySelectorAll('[data-action="load-word-set"]');
+    let inputClicks = 0;
+
+    fileInput.addEventListener('click', () => {
+      inputClicks += 1;
+    });
+    loadButtons.forEach((button) => {
+      if (button instanceof HTMLButtonElement) {
+        button.click();
+      }
+    });
+
+    expect(fileInput.type).toBe('file');
+    expect(fileInput.accept).toBe('application/json,.json');
+    expect(loadButtons).toHaveLength(2);
+    expect(inputClicks).toBe(2);
+  });
+
+  it('imports selected JSON from the hidden input and allows same-file retry', async () => {
+    const savedWordSets: IWordSet[] = [];
+    const root = createInteractiveRoot(INITIAL_UI_STATE, createRecordingRepository(savedWordSets));
+    const file = new File([JSON.stringify(createWordSet())], 'words.json', {
+      type: 'application/json',
+    });
+
+    defineInputFiles(getInput(root, '[data-word-set-file-input="true"]'), file);
+    getInput(root, '[data-word-set-file-input="true"]').dispatchEvent(new Event('change', { bubbles: true }));
+    await waitForAsyncImport();
+    defineInputFiles(getInput(root, '[data-word-set-file-input="true"]'), file);
+    getInput(root, '[data-word-set-file-input="true"]').dispatchEvent(new Event('change', { bubbles: true }));
+    await waitForAsyncImport();
+
+    expect(savedWordSets).toHaveLength(2);
+    expect(root.textContent).toContain('Базовый набор · 2 слов');
   });
 
   it('renders dark theme modifier and next-action theme tooltip', () => {
@@ -197,17 +238,16 @@ describe('renderApp', () => {
   });
 });
 
-function createInteractiveRoot(): HTMLElement {
+function createInteractiveRoot(
+  state: IUiState = createLoadedState(),
+  repository: IWordSetRepository = createNoopRepository(),
+): HTMLElement {
   const root = document.createElement('main');
-  const state: IUiState = {
-    ...INITIAL_UI_STATE,
-    phase: PAGE_PHASE.LOADED,
-    activeWordSetId: 'set-1',
-    wordSet: createWordSet(),
-  };
   const store = createStore(state, uiReducer);
 
-  attachAppEventHandlers(root, store);
+  attachAppEventHandlers(root, store, {
+    repository,
+  });
   renderApp(root, store.getState());
   store.subscribe((nextState) => {
     renderApp(root, nextState);
@@ -226,6 +266,16 @@ function getButton(root: HTMLElement, selector: string): HTMLButtonElement {
   return button;
 }
 
+function getInput(root: HTMLElement, selector: string): HTMLInputElement {
+  const input = root.querySelector(selector);
+
+  if (!(input instanceof HTMLInputElement)) {
+    throw new Error(`Missing input for selector ${selector}`);
+  }
+
+  return input;
+}
+
 function getElement(root: HTMLElement, selector: string): Element {
   const element = root.querySelector(selector);
 
@@ -234,6 +284,74 @@ function getElement(root: HTMLElement, selector: string): Element {
   }
 
   return element;
+}
+
+interface ITestFileList {
+  item(index: number): File | null;
+  length: number;
+}
+
+function defineInputFiles(input: HTMLInputElement, file: File): void {
+  const files: ITestFileList = {
+    length: 1,
+    item(index) {
+      return index === 0 ? file : null;
+    },
+  };
+
+  Object.defineProperty(input, 'files', {
+    configurable: true,
+    value: files,
+  });
+}
+
+function waitForAsyncImport(): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(resolve, 0);
+  });
+}
+
+function createLoadedState(): IUiState {
+  return {
+    ...INITIAL_UI_STATE,
+    phase: PAGE_PHASE.LOADED,
+    activeWordSetId: 'set-1',
+    wordSet: createWordSet(),
+  };
+}
+
+function createNoopRepository(): IWordSetRepository {
+  return createRecordingRepository([]);
+}
+
+function createRecordingRepository(savedWordSets: IWordSet[]): IWordSetRepository {
+  return {
+    async save(wordSet) {
+      savedWordSets.push(wordSet);
+
+      return {
+        ok: true,
+        value: createPersistedRecord(wordSet),
+      };
+    },
+    async getById() {
+      return {
+        ok: true,
+        value: null,
+      };
+    },
+  };
+}
+
+function createPersistedRecord(wordSet: IWordSet): IPersistedWordSetRecord {
+  return {
+    id: wordSet.id,
+    schemaVersion: 1,
+    name: wordSet.name,
+    words: wordSet.words,
+    createdAt: '2026-07-12T00:00:00.000Z',
+    updatedAt: '2026-07-12T00:00:00.000Z',
+  };
 }
 
 function createWordSet(): IWordSet {

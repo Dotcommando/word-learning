@@ -45,7 +45,7 @@ export function createAppTemplate(state: IUiState): HTMLElement {
 
   app.dataset['screenLabel'] = 'Тренажёр греческих слов';
   wrap.append(createHeader(), createPanel(state), createContentState(state));
-  app.append(wrap);
+  app.append(wrap, createWordSetFileInput());
 
   return app;
 }
@@ -186,7 +186,15 @@ function createLoadedState(state: IUiState): HTMLElement {
     return statebox;
   }
 
-  return createWordTable(state.wordSet, state);
+  const content = createElement('div', 'content-stack');
+
+  if (state.errorMessage !== null) {
+    content.append(createInlineError(state.errorMessage));
+  }
+
+  content.append(createWordTable(state.wordSet, state));
+
+  return content;
 }
 
 function createStatebox(screenLabel: string): HTMLElement {
@@ -195,6 +203,26 @@ function createStatebox(screenLabel: string): HTMLElement {
   statebox.dataset['screenLabel'] = screenLabel;
 
   return statebox;
+}
+
+function createInlineError(errorMessage: string): HTMLElement {
+  const error = createElement('p', '_content-error', errorMessage);
+
+  error.setAttribute('role', 'alert');
+
+  return error;
+}
+
+function createWordSetFileInput(): HTMLInputElement {
+  const input = document.createElement('input');
+
+  input.className = '_app-file-input';
+  input.type = 'file';
+  input.accept = 'application/json,.json';
+  input.dataset['wordSetFileInput'] = 'true';
+  input.setAttribute('aria-label', 'Выбрать JSON набор слов');
+
+  return input;
 }
 
 function createWordTable(wordSet: IWordSet, state: IUiState): HTMLElement {
