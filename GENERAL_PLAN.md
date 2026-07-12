@@ -401,7 +401,7 @@ Create a small typed Flux store with pure reducers, subscriptions, and determini
 
 ## Step 4 — Add One-Expression localStorage Persistence
 
-**Status:** [ ]
+**Status:** [x]
 
 ### Goal
 
@@ -450,12 +450,12 @@ Make selected stores persistable through one declaration expression while keepin
 
 ### Definition Of Done
 
-- [ ] Store persistence is enabled through one declaration expression.
-- [ ] Persisted data is versioned and validated.
-- [ ] Transient state is excluded.
-- [ ] Storage failure is non-fatal.
-- [ ] All persistence tests pass.
-- [ ] The exact declaration expression is recorded in the progress log.
+- [x] Store persistence is enabled through one declaration expression.
+- [x] Persisted data is versioned and validated.
+- [x] Transient state is excluded.
+- [x] Storage failure is non-fatal.
+- [x] All persistence tests pass.
+- [x] The exact declaration expression is recorded in the progress log.
 
 ---
 
@@ -1120,3 +1120,33 @@ Plan changes:
 - Reassessed Step 4: persistence must serialize `ReadonlySet<string>` UI collections as validated id arrays, exclude transient `phase`, `errorMessage`, and `wordSet`, then hydrate back to sets.
 - Reassessed Step 5: IndexedDB repository remains responsible only for validated word-set records; reducer/store do not import IndexedDB.
 - Reassessed Step 6: bootstrap orchestration should dispatch `BOOTSTRAP_STARTED`, then `BOOTSTRAP_SUCCEEDED` with `IWordSet | null`, `BOOTSTRAP_FAILED`, or `INVALID_ACTIVE_SET_CLEARED` for missing active records.
+
+### 2026-07-12 — Step 4
+
+Implemented:
+- Added generic `withPersistence` store decorator and persistence adapter contract.
+- Added UI-state localStorage persistence with explicit storage key and schema version.
+- Added versioned persisted state validation and hydration that merges valid persisted values with current defaults.
+- Persisted only interface state: theme, active word-set id, global translation visibility, revealed translation ids, revealed example translation ids, and expanded word ids.
+- Excluded transient `phase`, `errorMessage`, and `wordSet` from persisted data.
+- Added non-fatal handling for missing, malformed, incompatible, unavailable, and quota-throwing storage.
+- Added one-expression UI store declaration:
+  `export const uiStore = withPersistence(createStore(INITIAL_UI_STATE, uiReducer), localStoragePersistence(UI_STATE_STORAGE_KEY, UI_STATE_VERSION));`
+- Restored `npm run lint` to non-mutating `eslint .` and added `lint:fix` for explicit autofix runs.
+
+Verified:
+- `npm run typecheck`
+- passed
+- `npm run lint`
+- passed
+- `npm run test`
+- 5 test files passed, 24 tests passed
+- `npm run check`
+- passed
+- `rg -n "localStorage|sessionStorage|indexedDB" src --glob '*.ts' || true`
+- storage access is limited to UI persistence setup/adapter files.
+
+Plan changes:
+- Reassessed Step 5: IndexedDB repository can use `IPersistedWordSetRecord` independently of localStorage-backed UI state.
+- Reassessed Step 6: bootstrap should read active id from hydrated `uiStore.getState().activeWordSetId` before querying IndexedDB.
+- Reassessed Step 7: rendering should subscribe to `uiStore` but must not call localStorage directly.
