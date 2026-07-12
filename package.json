@@ -6,16 +6,25 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "lint": "eslint ."
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "build": "vite build && node scripts/assert-single-file-build.mjs",
+    "check": "npm run typecheck && npm run lint && npm run test && npm run build"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
     "@stylistic/eslint-plugin": "5.10.0",
+    "@types/node": "26.1.1",
     "@typescript-eslint/eslint-plugin": "8.63.0",
     "@typescript-eslint/parser": "8.63.0",
     "eslint": "10.7.0",
     "eslint-plugin-simple-import-sort": "13.0.0",
     "globals": "17.7.0",
-    "typescript": "5.9.3"
+    "jsdom": "29.1.1",
+    "typescript": "5.9.3",
+    "vite": "8.1.4",
+    "vite-plugin-singlefile": "2.3.3",
+    "vitest": "4.1.10"
   }
 }

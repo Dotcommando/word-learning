@@ -223,7 +223,7 @@ Understand the current repository, locate all Claude Design reference files unde
 
 ## Step 1 — Create The Framework-Free Build And Test Skeleton
 
-**Status:** [ ]
+**Status:** [x]
 
 ### Goal
 
@@ -262,13 +262,13 @@ A suitable tool choice is Vite plus a single-file inlining plugin, Vitest, and j
 
 ### Definition Of Done
 
-- [ ] Strict TypeScript is enabled.
-- [ ] The app boots from separated source files.
-- [ ] `npm` scripts for typecheck, test, build, and check exist.
-- [ ] The build emits exactly `dist/index.html`.
-- [ ] The generated page does not load `support.js` or `_ds_bundle.js`.
-- [ ] A test or script enforces the one-file output contract.
-- [ ] The step is marked complete with commands and results recorded.
+- [x] Strict TypeScript is enabled.
+- [x] The app boots from separated source files.
+- [x] `npm` scripts for typecheck, test, build, and check exist.
+- [x] The build emits exactly `dist/index.html`.
+- [x] The generated page does not load `support.js` or `_ds_bundle.js`.
+- [x] A test or script enforces the one-file output contract.
+- [x] The step is marked complete with commands and results recorded.
 
 ---
 
@@ -1033,3 +1033,33 @@ Verified:
 Plan changes:
 - ...
 ```
+
+### 2026-07-12 — Step 1
+
+Implemented:
+- Added strict TypeScript configuration for browser source, tests, and local config files.
+- Added Vite with `vite-plugin-singlefile`, Vitest with jsdom, and exact package versions in `package.json`/`package-lock.json`.
+- Added scripts for `typecheck`, `lint`, `test`, `build`, and `check`.
+- Created the initial framework-free source tree under `src/` with separated HTML, TypeScript, and CSS.
+- Added a minimal bootable `Λέξεις` page without Claude Design runtime dependencies.
+- Added a Vitest bootstrap smoke test.
+- Added `scripts/assert-single-file-build.mjs` to fail builds unless `dist/` contains exactly `index.html` with inline CSS and JavaScript and no `example/`, `support.js`, or `_ds_bundle.js` references.
+
+Verified:
+- `npm run typecheck`
+- passed
+- `npm run lint`
+- passed
+- `npm run test`
+- 1 test file passed, 1 test passed
+- `npm run build`
+- passed and emitted `dist/index.html`
+- `npm run check`
+- passed
+- `find dist -maxdepth 1 -type f`
+- returned only `dist/index.html`
+- inline inspection confirmed inline `<style>`, inline executable `<script>`, no external CSS/JS references, and no Claude Design runtime references.
+
+Plan changes:
+- Reassessed Steps 2, 3, and 4; they remain executable against the new strict TypeScript, Vitest/jsdom, and framework-free source skeleton.
+- No architecture or scope contract changed.

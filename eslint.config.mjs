@@ -24,6 +24,15 @@ export default [
   },
   js.configs.recommended,
   {
+    files: ['*.config.mjs', 'scripts/**/*.mjs', 'eslint.config.mjs'],
+    languageOptions: {
+      sourceType: 'module',
+      globals: {
+        ...globals.node,
+      },
+    },
+  },
+  {
     files: ['*.config.cjs', 'tests/**/*.cjs'],
     languageOptions: {
       sourceType: 'commonjs',

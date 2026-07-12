@@ -1,0 +1,71 @@
+html {
+  min-height: 100%;
+  background: #f4eadf;
+}
+
+body {
+  min-height: 100%;
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  color: #2d241c;
+}
+
+.app {
+  --app-background: #f4eadf;
+  --app-panel: #fffaf3;
+  --app-text: #2d241c;
+  --app-muted: #766656;
+  --app-border: #d8c4ad;
+  --app-shadow: 0 18px 48px rgb(77 55 32 / 12%);
+  --app-radius: 8px;
+  --app-space: 24px;
+  --app-container-width: 760px;
+
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: var(--app-space);
+  background: var(--app-background);
+  color: var(--app-text);
+}
+
+._app-shell {
+  width: min(100%, var(--app-container-width));
+  margin: 0 auto;
+  padding: 32px;
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius);
+  background: var(--app-panel);
+  box-shadow: var(--app-shadow);
+}
+
+._app-title {
+  margin: 0 0 8px;
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+._app-subtitle {
+  margin: 0;
+  color: var(--app-muted);
+  font-size: 18px;
+  line-height: 1.5;
+}
+
+@media (min-width: 992px) {
+  .app {
+    --app-container-width: 920px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .app {
+    --app-container-width: 1080px;
+  }
+}
+
+@media (min-width: 1440px) {
+  .app {
+    --app-container-width: 1240px;
+  }
+}
