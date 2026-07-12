@@ -461,7 +461,7 @@ Make selected stores persistable through one declaration expression while keepin
 
 ## Step 5 — Implement The IndexedDB Word-Set Repository
 
-**Status:** [ ]
+**Status:** [x]
 
 ### Goal
 
@@ -504,12 +504,12 @@ Persist imported word sets in IndexedDB behind a focused repository.
 
 ### Definition Of Done
 
-- [ ] IndexedDB schema and version are explicit.
-- [ ] Valid word sets round-trip without data loss.
-- [ ] Missing ids are handled predictably.
-- [ ] Errors are surfaced to effects.
-- [ ] Tests pass.
-- [ ] Future picker support does not require changing stored record shape.
+- [x] IndexedDB schema and version are explicit.
+- [x] Valid word sets round-trip without data loss.
+- [x] Missing ids are handled predictably.
+- [x] Errors are surfaced to effects.
+- [x] Tests pass.
+- [x] Future picker support does not require changing stored record shape.
 
 ---
 
@@ -1150,3 +1150,32 @@ Plan changes:
 - Reassessed Step 5: IndexedDB repository can use `IPersistedWordSetRecord` independently of localStorage-backed UI state.
 - Reassessed Step 6: bootstrap should read active id from hydrated `uiStore.getState().activeWordSetId` before querying IndexedDB.
 - Reassessed Step 7: rendering should subscribe to `uiStore` but must not call localStorage directly.
+
+### 2026-07-12 — Step 5
+
+Implemented:
+- Added `fake-indexeddb@6.2.5` as the IndexedDB test strategy.
+- Added explicit IndexedDB constants for database name, version, object-store name, and stored record schema version.
+- Added a focused word-set repository with `save` and `getById`.
+- Stored `IPersistedWordSetRecord` records with stable id, name, validated words, schema version, created timestamp, and updated timestamp.
+- Created the object store with `keyPath: 'id'` during database upgrade.
+- Added typed repository result and error contracts for unavailable IndexedDB, open failures, transaction failures, and invalid stored records.
+- Validated stored records on read through the canonical word-set validator before returning them.
+- Added tests for saving/loading the six-word reference set, missing records, and a failed write transaction.
+
+Verified:
+- `npm run typecheck`
+- passed
+- `npm run lint`
+- passed
+- `npm run test`
+- 6 test files passed, 27 tests passed
+- `npm run check`
+- passed
+- `rg -n "indexed-db|createIndexedDbWordSetRepository|indexedDB" src --glob '*.ts' || true`
+- IndexedDB access is limited to `src/persistence/indexed-db.ts`.
+
+Plan changes:
+- Reassessed Step 6: bootstrap can instantiate/use the repository, dispatch typed failure state from repository errors, and treat `getById` success with `null` as invalid active-set clearing.
+- Reassessed Step 7: static rendering remains independent of IndexedDB and should read loaded data only from UI store state.
+- Reassessed Step 8: table rendering can rely on validated `IWordSet.words` and stable word ids produced before persistence.
