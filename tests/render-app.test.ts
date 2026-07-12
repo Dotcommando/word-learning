@@ -33,6 +33,29 @@ describe('renderApp', () => {
     expect(root.querySelector('[data-action="toggle-all-translations"]')?.hasAttribute('disabled')).toBe(true);
   });
 
+  it('renders concise live status announcements for state changes', () => {
+    const root = document.createElement('main');
+
+    renderApp(root, {
+      ...INITIAL_UI_STATE,
+      phase: PAGE_PHASE.LOADING,
+    });
+
+    expect(root.querySelector('[role="status"]')?.textContent).toBe('Загружаем набор слов.');
+
+    renderApp(root, {
+      ...INITIAL_UI_STATE,
+      phase: PAGE_PHASE.ERROR,
+      errorMessage: 'Не удалось открыть IndexedDB.',
+    });
+
+    expect(root.querySelector('[role="status"]')?.textContent).toContain('Ошибка: Не удалось открыть IndexedDB.');
+
+    renderApp(root, createLoadedState());
+
+    expect(root.querySelector('[role="status"]')?.textContent).toBe('Набор Базовый набор загружен.');
+  });
+
   it('renders one hidden JSON file input controlled by both upload entry points', () => {
     const root = createInteractiveRoot(INITIAL_UI_STATE);
     const fileInput = getInput(root, '[data-word-set-file-input="true"]');
@@ -50,6 +73,7 @@ describe('renderApp', () => {
 
     expect(fileInput.type).toBe('file');
     expect(fileInput.accept).toBe('application/json,.json');
+    expect(fileInput.tabIndex).toBe(-1);
     expect(loadButtons).toHaveLength(2);
     expect(inputClicks).toBe(2);
   });
@@ -61,6 +85,7 @@ describe('renderApp', () => {
       type: 'application/json',
     });
 
+    document.body.replaceChildren(root);
     defineInputFiles(getInput(root, '[data-word-set-file-input="true"]'), file);
     getInput(root, '[data-word-set-file-input="true"]').dispatchEvent(new Event('change', { bubbles: true }));
     await waitForAsyncImport();
@@ -70,6 +95,9 @@ describe('renderApp', () => {
 
     expect(savedWordSets).toHaveLength(2);
     expect(root.textContent).toContain('Базовый набор · 2 слов');
+    expect(document.activeElement instanceof HTMLElement ? document.activeElement.dataset['focusKey'] : null).toBe('toolbar-load-word-set');
+
+    document.body.replaceChildren();
   });
 
   it('renders dark theme modifier and next-action theme tooltip', () => {
@@ -163,6 +191,22 @@ describe('renderApp', () => {
 
     expect(getButton(root, '[data-action="toggle-example-translation"][data-word-id="word-1"]').classList.contains('_word-table-mask__revealed')).toBe(true);
     expect(getButton(root, '[data-action="toggle-word-translation"][data-word-id="word-2"]').classList.contains('_word-table-mask__hidden')).toBe(true);
+  });
+
+  it('preserves focus on controls across state-driven rerenders', () => {
+    const root = createInteractiveRoot();
+
+    document.body.replaceChildren(root);
+
+    const translationButton = getButton(root, '[data-action="toggle-word-translation"][data-word-id="word-1"]');
+
+    translationButton.focus();
+    translationButton.click();
+
+    expect(document.activeElement instanceof HTMLElement ? document.activeElement.dataset['focusKey'] : null).toBe('toggle-word-translation-word-1');
+    expect(getButton(root, '[data-action="toggle-word-translation"][data-word-id="word-1"]').classList.contains('_word-table-mask__revealed')).toBe(true);
+
+    document.body.replaceChildren();
   });
 
   it('uses the global translation toggle to show mixed rows and then hide all rows', () => {

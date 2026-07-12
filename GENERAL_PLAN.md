@@ -804,7 +804,7 @@ Replace the reference's simulated upload with a real file-selection, validation,
 
 ## Step 11 — Complete Page States, Tooltips, And Accessibility
 
-**Status:** [ ]
+**Status:** [x]
 
 ### Goal
 
@@ -844,13 +844,13 @@ Finish empty, loading, loaded, and error states and make every interaction usabl
 
 ### Definition Of Done
 
-- [ ] All four page phases have finished visuals.
-- [ ] Every interactive control is keyboard-operable.
-- [ ] Tooltips and labels describe the next action.
-- [ ] Focus is visible and stable.
-- [ ] Reduced-motion behavior is implemented.
-- [ ] No state is communicated only by color.
-- [ ] Accessibility verification results are recorded.
+- [x] All four page phases have finished visuals.
+- [x] Every interactive control is keyboard-operable.
+- [x] Tooltips and labels describe the next action.
+- [x] Focus is visible and stable.
+- [x] Reduced-motion behavior is implemented.
+- [x] No state is communicated only by color.
+- [x] Accessibility verification results are recorded.
 
 ---
 
@@ -1344,3 +1344,39 @@ Plan changes:
 - Reassessed Step 11: focus preservation after file import and rerender is now concrete work; the upload buttons and file input need final accessibility polish.
 - Reassessed Step 12: visual checks should include loaded error banners after failed replacement import.
 - Reassessed Step 13: final build verification should include a real import/reload smoke path now that IndexedDB and UI import are connected.
+
+### 2026-07-12 — Step 11
+
+Implemented:
+- Added stable `data-focus-key` hooks to toolbar, statebox, word-cell, and translation controls.
+- Updated `renderApp` to preserve focus across state-driven full rerenders when the focused control still exists.
+- Restored focus to the toolbar upload control after file import attempts so focus does not remain on a replaced hidden input.
+- Added a concise visually hidden `role="status"` live region for loading, loaded, and error state announcements.
+- Made the hidden file input programmatically controlled and removed it from tab order with `tabIndex = -1`.
+- Added edge-aware toolbar tooltip positioning while keeping tooltip text available on hover and keyboard focus.
+- Kept existing visible focus styles and reduced-motion handling, and extended test coverage for focus stability, status text, and file input tab behavior.
+
+Verified:
+- `npm run typecheck`
+- passed
+- `npm run lint`
+- passed
+- `npm run test`
+- 9 test files passed, 50 tests passed
+- `npm run build`
+- passed and emitted `dist/index.html`
+- `npm run check`
+- passed
+- `npm ls axe-core --depth=0 || true`
+- no workspace accessibility audit package is installed
+- `rg -n "role=\"status\"|role', 'status'|role=\"alert\"|aria-live|aria-atomic|aria-expanded|aria-controls|aria-label|data-tooltip|focus-visible|prefers-reduced-motion|data-focus-key" src tests`
+- confirmed status, alert, aria, tooltip, focus, and reduced-motion hooks are present and covered
+- `find dist -maxdepth 1 -type f -print`
+- returned only `dist/index.html`
+- `rg -n "support\\.js|_ds_bundle|<x-dc|<sc-if|<sc-for|DCLogic" src dist/index.html --glob '!example/**' || true`
+- no matches
+
+Plan changes:
+- Reassessed Step 12: responsive/visual pass can now focus on measurable layout and fidelity gaps rather than missing accessibility primitives.
+- Reassessed Step 13: final verification should rerun keyboard navigation and import/reload smoke checks after visual adjustments.
+- Reassessed Step 14: documentation/final notes should mention that no dedicated a11y audit package is installed unless one is added later.

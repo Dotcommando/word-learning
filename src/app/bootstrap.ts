@@ -80,6 +80,7 @@ export function attachAppEventHandlers(
       store,
     }).finally(() => {
       input.value = '';
+      focusByKey(root, 'toolbar-load-word-set');
     });
   });
 }
@@ -192,6 +193,20 @@ function openWordSetFilePicker(root: HTMLElement): void {
 
   if (input instanceof HTMLInputElement) {
     input.click();
+  }
+}
+
+function focusByKey(root: HTMLElement, focusKey: string): void {
+  const candidates = root.querySelectorAll('[data-focus-key]');
+
+  for (const candidate of candidates) {
+    if (candidate instanceof HTMLElement && candidate.dataset['focusKey'] === focusKey) {
+      candidate.focus({
+        preventScroll: true,
+      });
+
+      return;
+    }
   }
 }
 

@@ -45,7 +45,7 @@ export function createAppTemplate(state: IUiState): HTMLElement {
 
   app.dataset['screenLabel'] = 'Тренажёр греческих слов';
   wrap.append(createHeader(), createPanel(state), createContentState(state));
-  app.append(wrap, createWordSetFileInput());
+  app.append(wrap, createStatusRegion(state), createWordSetFileInput());
 
   return app;
 }
@@ -82,6 +82,7 @@ function createToolbar(state: IUiState): HTMLElement {
       createUploadIcon(),
       false,
       'load-word-set',
+      'toolbar-load-word-set',
     ),
     createIconButton(
       '_toolbar-button tooltip',
@@ -90,6 +91,7 @@ function createToolbar(state: IUiState): HTMLElement {
       areAllCurrentTranslationsVisible(state) ? createEyeOffIcon() : createEyeIcon(),
       state.phase !== PAGE_PHASE.LOADED,
       'toggle-all-translations',
+      'toolbar-toggle-all-translations',
     ),
     createIconButton(
       '_toolbar-button tooltip',
@@ -98,6 +100,7 @@ function createToolbar(state: IUiState): HTMLElement {
       state.theme === THEME_MODE.DARK ? createSunIcon() : createMoonIcon(),
       false,
       'toggle-theme',
+      'toolbar-toggle-theme',
     ),
   );
 
@@ -111,6 +114,7 @@ function createIconButton(
   icon: SVGSVGElement,
   disabled: boolean,
   action: string,
+  focusKey: string,
 ): HTMLButtonElement {
   const button = document.createElement('button');
 
@@ -120,6 +124,7 @@ function createIconButton(
   button.setAttribute('aria-label', ariaLabel);
   button.dataset['tooltip'] = tooltip;
   button.dataset['action'] = action;
+  button.dataset['focusKey'] = focusKey;
   button.append(icon);
 
   return button;
@@ -146,6 +151,7 @@ function createEmptyState(): HTMLElement {
   button.className = '_statebox-button';
   button.type = 'button';
   button.dataset['action'] = 'load-word-set';
+  button.dataset['focusKey'] = 'statebox-load-word-set';
   button.append(LOAD_WORD_SET_TEXT);
   statebox.append(createBookIcon(), text, button);
 
@@ -170,6 +176,7 @@ function createErrorState(errorMessage: string | null): HTMLElement {
   button.className = '_statebox-button';
   button.type = 'button';
   button.dataset['action'] = 'load-word-set';
+  button.dataset['focusKey'] = 'statebox-load-word-set';
   button.append(LOAD_WORD_SET_TEXT);
   statebox.append(text, button);
 
@@ -219,10 +226,21 @@ function createWordSetFileInput(): HTMLInputElement {
   input.className = '_app-file-input';
   input.type = 'file';
   input.accept = 'application/json,.json';
+  input.tabIndex = -1;
   input.dataset['wordSetFileInput'] = 'true';
   input.setAttribute('aria-label', 'Выбрать JSON набор слов');
 
   return input;
+}
+
+function createStatusRegion(state: IUiState): HTMLElement {
+  const status = createElement('p', '_app-status', createStatusText(state));
+
+  status.setAttribute('role', 'status');
+  status.setAttribute('aria-live', 'polite');
+  status.setAttribute('aria-atomic', 'true');
+
+  return status;
 }
 
 function createWordTable(wordSet: IWordSet, state: IUiState): HTMLElement {
@@ -315,6 +333,7 @@ function createWordCell(word: IWord, isExpanded: boolean): HTMLTableCellElement 
   button.dataset['action'] = 'toggle-declension';
   button.dataset['wordId'] = word.id;
   button.dataset['tooltip'] = tooltip;
+  button.dataset['focusKey'] = `word-${word.id}`;
   button.setAttribute('aria-expanded', String(isExpanded));
   button.setAttribute('aria-controls', detailId);
   button.setAttribute('aria-label', `${tooltip} слова ${word.word}`);
@@ -433,6 +452,7 @@ function createTranslationCell(options: ITranslationCellOptions): HTMLTableCellE
   button.type = 'button';
   button.dataset['action'] = options.action;
   button.dataset['wordId'] = options.wordId;
+  button.dataset['focusKey'] = `${options.action}-${options.wordId}`;
   button.setAttribute('aria-label', options.isRevealed ? options.visibleLabel : options.hiddenLabel);
   button.textContent = options.text;
   cell.append(button);
@@ -459,4 +479,17 @@ function createTranslationToggleLabel(state: IUiState): string {
 
 function createThemeToggleLabel(state: IUiState): string {
   return state.theme === THEME_MODE.DARK ? 'Включить светлую тему' : 'Включить тёмную тему';
+}
+
+function createStatusText(state: IUiState): string {
+  switch (state.phase) {
+    case PAGE_PHASE.LOADING:
+      return 'Загружаем набор слов.';
+    case PAGE_PHASE.ERROR:
+      return state.errorMessage === null ? 'Ошибка загрузки набора слов.' : `Ошибка: ${state.errorMessage}`;
+    case PAGE_PHASE.LOADED:
+      return state.wordSet === null ? 'Набор загружен.' : `Набор ${state.wordSet.name} загружен.`;
+    case PAGE_PHASE.EMPTY:
+      return '';
+  }
 }

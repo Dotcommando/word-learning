@@ -117,6 +117,16 @@ button {
   white-space: nowrap;
 }
 
+._app-status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 .content-stack {
   display: grid;
   gap: 14px;
@@ -231,6 +241,27 @@ button {
 .tooltip:focus-visible::after {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
+}
+
+.toolbar .tooltip:first-child::after {
+  left: 0;
+  transform: translateX(0) translateY(-3px);
+}
+
+.toolbar .tooltip:first-child:hover::after,
+.toolbar .tooltip:first-child:focus-visible::after {
+  transform: translateX(0) translateY(0);
+}
+
+.toolbar .tooltip:last-child::after {
+  right: 0;
+  left: auto;
+  transform: translateX(0) translateY(-3px);
+}
+
+.toolbar .tooltip:last-child:hover::after,
+.toolbar .tooltip:last-child:focus-visible::after {
+  transform: translateX(0) translateY(0);
 }
 
 .statebox {
