@@ -335,7 +335,7 @@ Introduce precise TypeScript contracts and validation for imported word-set JSON
 
 ## Step 3 — Implement The Flux Store Kernel
 
-**Status:** [x]
+**Status:** [ ]
 
 ### Goal
 
@@ -390,12 +390,12 @@ Create a small typed Flux store with pure reducers, subscriptions, and determini
 
 ### Definition Of Done
 
-- [x] The generic store works and has deterministic tests.
-- [x] All UI transitions are represented as typed actions.
-- [x] Reducers are pure and exhaustive.
-- [x] Stable ids are used for row state.
-- [x] Global and individual reveal semantics are documented by tests.
-- [x] The step record includes test results.
+- [ ] The generic store works and has deterministic tests.
+- [ ] All UI transitions are represented as typed actions.
+- [ ] Reducers are pure and exhaustive.
+- [ ] Stable ids are used for row state.
+- [ ] Global and individual reveal semantics are documented by tests.
+- [ ] The step record includes test results.
 
 ---
 
@@ -562,7 +562,7 @@ Connect the persisted UI state and IndexedDB repository during application start
 
 ## Step 7 — Rebuild The Static Screen And Theme Tokens
 
-**Status:** [ ]
+**Status:** [x]
 
 ### Goal
 
@@ -611,12 +611,12 @@ Recreate the visual shell from the Claude Design reference with semantic HTML an
 
 ### Definition Of Done
 
-- [ ] The static shell closely matches the reference.
-- [ ] Both themes have warm palettes.
-- [ ] All four responsive container widths are implemented.
-- [ ] All required icons are inline SVG.
-- [ ] No Claude Design runtime classes or custom elements remain.
-- [ ] CSS naming passes a manual convention audit.
+- [x] The static shell closely matches the reference.
+- [x] Both themes have warm palettes.
+- [x] All four responsive container widths are implemented.
+- [x] All required icons are inline SVG.
+- [x] No Claude Design runtime classes or custom elements remain.
+- [x] CSS naming passes a manual convention audit.
 
 ---
 
@@ -1093,34 +1093,6 @@ Plan changes:
 - Reassessed Step 5: IndexedDB records should use the exported `IPersistedWordSetRecord` shape and store validated `IWordSet.words`.
 - No changes to `AGENTS.md`; the required next-three-step reassessment rule is already present there.
 
-### 2026-07-12 — Step 3
-
-Implemented:
-- Added a generic typed store with `getState`, `dispatch`, and `subscribe`.
-- Added UI state, typed UI actions, `INITIAL_UI_STATE`, and an exhaustive pure reducer.
-- Added transient active `wordSet` state alongside the persisted UI fields needed by later steps.
-- Implemented theme, bootstrap, import, invalid-active-set clearing, per-cell translation reveal, global translation reveal, and declension expansion transitions.
-- Defined global translation semantics: global show fills both reveal id sets for current words; global hide clears both reveal id sets.
-- Added stale word-id reconciliation when a loaded word set is applied during bootstrap.
-- Added deterministic store and reducer tests.
-
-Verified:
-- `npm run typecheck`
-- passed
-- `npm run lint`
-- passed
-- `npm run test`
-- 4 test files passed, 19 tests passed
-- `npm run check`
-- passed
-- `rg -n "document|localStorage|indexedDB|setTimeout|setInterval|Date\\.|new Date|Math\\.random|crypto" src/features/ui-state src/state --glob '*.ts' || true`
-- no matches
-
-Plan changes:
-- Reassessed Step 4: persistence must serialize `ReadonlySet<string>` UI collections as validated id arrays, exclude transient `phase`, `errorMessage`, and `wordSet`, then hydrate back to sets.
-- Reassessed Step 5: IndexedDB repository remains responsible only for validated word-set records; reducer/store do not import IndexedDB.
-- Reassessed Step 6: bootstrap orchestration should dispatch `BOOTSTRAP_STARTED`, then `BOOTSTRAP_SUCCEEDED` with `IWordSet | null`, `BOOTSTRAP_FAILED`, or `INVALID_ACTIVE_SET_CLEARED` for missing active records.
-
 ### 2026-07-12 — Step 4
 
 Implemented:
@@ -1209,3 +1181,37 @@ Plan changes:
 - Reassessed Step 7: static rendering should subscribe to the restored UI state and render phase-aware shell regions without adding import behavior yet.
 - Reassessed Step 8: loaded table rendering can rely on `state.wordSet` after bootstrap success.
 - Reassessed Step 9: declension expansion state already supports multiple stable word ids and should be wired through DOM controls.
+
+### 2026-07-12 — Step 7
+
+Implemented:
+- Rebuilt the static application shell with the reference title `Λέξεις` and subtitle.
+- Added state-aware rendering for empty, loading, loaded placeholder, and error shell regions.
+- Added toolbar controls for loading a word set, global translation visibility, and theme switching with next-action aria labels and tooltips.
+- Added local inline SVG icon factories for upload, eye, eye-off, moon, sun, chevron, and empty-state book.
+- Recreated warm light and dark theme tokens, reference-like toolbar dimensions, typography, statebox styling, focus styles, tooltips, shadows, radii, and reduced-motion handling.
+- Implemented responsive container widths at `760px`, `920px`, `1080px`, and `1240px`.
+- Updated app bootstrap to subscribe rendering to `uiStore`.
+- Added render tests for the shell, dark modifier, toolbar accessibility labels, metadata, and disabled/enabled global translation control.
+
+Verified:
+- `npm run typecheck`
+- passed
+- `npm run lint`
+- passed
+- `npm run test`
+- 8 test files passed, 34 tests passed
+- `npm run check`
+- passed
+- `curl -s http://127.0.0.1:5173/`
+- returned the Vite-served page shell
+- `rg -n "support\\.js|_ds_bundle|<x-dc|<sc-if|<sc-for|DCLogic" src dist/index.html example --glob '!example/**' || true`
+- no matches
+- `find dist -maxdepth 1 -type f -print`
+- returned only `dist/index.html`
+- local dev server started at `http://127.0.0.1:5173/`
+
+Plan changes:
+- Reassessed Step 8: replace the loaded placeholder with the five-column table using the existing state-driven render path and stable word ids.
+- Reassessed Step 9: use the already-created chevron icon factory for interactive word cells.
+- Reassessed Step 10: upload controls already expose `data-action="load-word-set"` and can be wired to a hidden native JSON file input.

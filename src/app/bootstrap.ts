@@ -19,7 +19,10 @@ export function bootstrapApp(): void {
     return;
   }
 
-  renderApp(appRoot);
+  renderApp(appRoot, uiStore.getState());
+  uiStore.subscribe((state) => {
+    renderApp(appRoot, state);
+  });
   void restoreActiveWordSet(uiStore, createIndexedDbWordSetRepository());
 }
 
